@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Orbital Slingshot — QC Core Mini-Game</title>
+  <link rel="stylesheet" href="orbital-slingshot.css?v=1">
+</head>
+<body>
+  <!-- Landscape Warning Overlay for coarse pointer devices -->
+  <div class="rotate-overlay" id="rotate-overlay">
+    <div class="rotate-icon"></div>
+    <div class="rotate-title">Rotate Your Device</div>
+    <div class="rotate-desc">Orbital Slingshot requires portrait orientation to accurately plot your slingshot trajectory.</div>
+  </div>
+
+  <!-- Centered 9:16 Portrait Game Stage -->
+  <main class="stage" id="stage" role="main">
+
+    <!-- ====================================================================
+         PAGE 1: LANDING & REAL ASSET PRELOADER
+         ==================================================================== -->
+    <section class="screen active" id="screen-landing" aria-label="Loading Screen">
+      <img src="../orbital-slingshot-assets/page-1/page-1-bg.png" alt="" class="screen-bg" id="landing-bg">
+
+      <header class="landing-top-bar">
+        <button class="btn-icon btn-landing-exit" id="btn-landing-exit" aria-label="Back to Gallery">‹ Exit</button>
+        <button class="btn-icon btn-mute" aria-label="Toggle Sound">🔊</button>
+      </header>
+
+      <div class="landing-header">
+        <img src="../orbital-slingshot-assets/page-1/emblem.png" alt="Cosmic Emblem" class="landing-emblem">
+        <h1 class="landing-title">Orbital Slingshot</h1>
+        <p class="landing-subtitle">Deep-Space Gravity Probe</p>
+      </div>
+
+      <div class="preloader-card">
+        <div class="preloader-label">
+          <span>Stellar Core Telemetry</span>
+          <span id="preloader-percent">100%</span>
+        </div>
+        <div class="preloader-bar-bg" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">
+          <div class="preloader-bar-fill" id="preloader-bar-fill" style="width: 100%;"></div>
+        </div>
+        <div class="preloader-status" id="preloader-status">Orbital telemetry nominal. Ready for launch.</div>
+      </div>
+
+      <div class="start-btn-wrap" id="start-btn-wrap">
+        <button class="btn-primary" id="btn-quick-play" aria-label="Quick Launch Level 1">🚀 Launch Game</button>
+        <button class="btn-secondary" id="btn-start" aria-label="Mission Campaign">🌌 Mission Briefing</button>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         PAGE 2: STORY & TUTORIAL BRIEFING
+         ==================================================================== -->
+    <section class="screen" id="screen-tutorial" aria-label="Mission Briefing">
+      <img src="../orbital-slingshot-assets/page-2/story-bg.png" alt="" class="screen-bg">
+
+      <header class="screen-header">
+        <button class="btn-icon" id="btn-tutorial-back" aria-label="Back to Landing">‹</button>
+        <div class="header-title-box">
+          <h2 class="header-title">Mission Briefing</h2>
+          <span class="header-subtitle">Tactical Flight Manual</span>
+        </div>
+        <button class="btn-icon btn-mute" aria-label="Toggle Sound">🔊</button>
+      </header>
+
+      <div class="tutorial-cards">
+        <div class="tutorial-card">
+          <img src="../orbital-slingshot-assets/page-2/slingshot-guide.png" alt="Slingshot Aim" class="tutorial-icon">
+          <div class="tutorial-text">
+            <h4>1. Pull Back & Launch</h4>
+            <p>Drag the probe or use on-screen steer & power buttons. A glowing dotted arc predicts your flight path.</p>
+          </div>
+        </div>
+
+        <div class="tutorial-card">
+          <img src="../orbital-slingshot-assets/page-2/gravity-guide.png" alt="Gravity Assist" class="tutorial-icon">
+          <div class="tutorial-text">
+            <h4>2. Gravity Assists</h4>
+            <p>Harness planetary gravity wells to bend your velocity vector around celestial obstacles.</p>
+          </div>
+        </div>
+
+        <div class="tutorial-card">
+          <img src="../orbital-slingshot-assets/page-4/planet-pulsar.png" alt="Repulsor Pulsars" class="tutorial-icon">
+          <div class="tutorial-text">
+            <h4>3. Repulsor Pulsars</h4>
+            <p>Violet anti-gravity pulsars repel your probe. Use their shockwaves for sharp hyperbolic maneuvers!</p>
+          </div>
+        </div>
+
+        <div class="tutorial-card">
+          <img src="../orbital-slingshot-assets/page-2/crystal-guide.png" alt="Star Crystals" class="tutorial-icon">
+          <div class="tutorial-text">
+            <h4>4. Crystals & Wormhole</h4>
+            <p>Collect all 3 Star Crystals in each sector and cross the Wormhole event horizon to earn 3 Stars.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="tutorial-footer">
+        <button class="btn-primary" id="btn-tutorial-continue" aria-label="Launch Campaign">Sector Map</button>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         PAGE 3: SECTOR MAP & SHIP HANGAR
+         ==================================================================== -->
+    <section class="screen" id="screen-map" aria-label="Cosmic Sector Map">
+      <img src="../orbital-slingshot-assets/page-3/map-bg.png" alt="" class="screen-bg">
+
+      <header class="map-top-bar">
+        <button class="btn-icon" id="btn-map-exit" aria-label="Exit Game">✕</button>
+        <div class="star-tally">
+          <img src="../orbital-slingshot-assets/page-4/star-crystal.png" alt="Stars" class="star-tally-icon">
+          <span class="star-tally-count" id="total-stars-count">0 / 36</span>
+        </div>
+        <button class="btn-icon" id="btn-open-hangar" aria-label="Ship Trail Hangar">🚀</button>
+        <button class="btn-icon btn-mute" aria-label="Toggle Sound">🔊</button>
+      </header>
+
+      <div class="map-scroll-container" id="levels-container">
+        <!-- Dynamically populated level cards (Levels 1 to 12 + Endless) -->
+      </div>
+
+      <!-- Ship Trail Hangar Drawer -->
+      <div class="hangar-drawer" id="hangar-drawer">
+        <div class="hangar-header">
+          <h3 class="hangar-title">Ion Trail Hangar</h3>
+          <button class="btn-icon" id="btn-close-hangar" aria-label="Close Hangar">✕</button>
+        </div>
+        <div class="trails-grid" id="trails-grid">
+          <!-- Populated by script -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         PAGE 4: ACTIVE GAMEPLAY ARENA
+         ==================================================================== -->
+    <section class="screen" id="screen-game" aria-label="Deep-Space Arena">
+      <!-- 2D Canvas Layer for Physics, Orbits & Particles -->
+      <canvas id="game-canvas"></canvas>
+
+      <!-- Slingshot Hit-Pad Interactive Reticle -->
+      <div class="slingshot-hitpad" id="slingshot-hitpad" aria-label="Slingshot Launcher">
+        <div class="hitpad-crosshair"></div>
+      </div>
+
+      <!-- Top HUD -->
+      <header class="game-hud">
+        <button class="btn-icon btn-hud-action" id="btn-game-map" aria-label="Back to Sector Map">🗺️ Map</button>
+        <div class="hud-center">
+          <div class="hud-level-title" id="hud-level-name">Sector 1: Orbit Alpha</div>
+          <div class="hud-crystals" id="hud-crystals-container">
+            <img src="../orbital-slingshot-assets/page-4/star-crystal.png" alt="Crystal 1" class="hud-crystal-icon" id="hud-crystal-1">
+            <img src="../orbital-slingshot-assets/page-4/star-crystal.png" alt="Crystal 2" class="hud-crystal-icon" id="hud-crystal-2">
+            <img src="../orbital-slingshot-assets/page-4/star-crystal.png" alt="Crystal 3" class="hud-crystal-icon" id="hud-crystal-3">
+          </div>
+        </div>
+        <div class="hud-right">
+          <div class="hud-shots-pill" id="hud-shots-pill">SHOT 1/2</div>
+          <button class="btn-icon" id="btn-game-retry" aria-label="Retry Level">↺</button>
+          <button class="btn-icon btn-mute" aria-label="Toggle Sound">🔊</button>
+          <button class="btn-icon" id="btn-game-exit" aria-label="Exit Game">✕</button>
+        </div>
+      </header>
+
+      <!-- Bottom Interactive Tactical Flight Deck -->
+      <footer class="game-controls-bar flight-deck" id="game-controls-bar">
+        <!-- Telemetry readout strip -->
+        <div class="telemetry-bar">
+          <span class="telemetry-item" id="telemetry-angle">ANGLE: -14°</span>
+          <span class="telemetry-item" id="telemetry-power">THRUST: 72%</span>
+          <span class="telemetry-item telemetry-mode" id="telemetry-status">STATUS: READY</span>
+        </div>
+
+        <!-- Primary control buttons row -->
+        <div class="deck-main-row">
+          <button class="btn-steer" id="btn-steer-left" aria-label="Curve Left (A or Left Arrow)">
+            <span class="btn-arrow">◀</span>
+            <span class="btn-label">LEFT <kbd>A</kbd></span>
+          </button>
+          <button class="btn-launch-fire" id="btn-launch-fire" aria-label="Launch Probe (Space or Enter)">
+            <span class="fire-icon">🚀</span>
+            <span class="fire-text">FIRE PROBE</span>
+            <span class="fire-kbd"><kbd>SPACE</kbd></span>
+          </button>
+          <button class="btn-steer" id="btn-steer-right" aria-label="Curve Right (D or Right Arrow)">
+            <span class="btn-label">RIGHT <kbd>D</kbd></span>
+            <span class="btn-arrow">▶</span>
+          </button>
+        </div>
+
+        <!-- Secondary auxiliary control row -->
+        <div class="deck-aux-row">
+          <button class="btn-deck-pill" id="btn-power-down" aria-label="Decrease Power (S or Down Arrow)">
+            <span>▼ -Power</span> <kbd>S</kbd>
+          </button>
+          <button class="btn-deck-pill" id="btn-recenter-aim" aria-label="Recenter Trajectory">
+            <span>↺ Center</span>
+          </button>
+          <button class="btn-deck-pill" id="btn-power-up" aria-label="Increase Power (W or Up Arrow)">
+            <span>▲ +Power</span> <kbd>W</kbd>
+          </button>
+          <button class="btn-deck-pill btn-info-toggle" id="btn-info-toggle" aria-label="Toggle Mission Rules">
+            <span>ℹ️ Rules</span> <kbd>I</kbd>
+          </button>
+        </div>
+      </footer>
+
+      <!-- Mission Rules & Physics Intel Modal -->
+      <div class="rules-modal" id="modal-rules" role="dialog" aria-modal="true" aria-label="Mission Rules">
+        <div class="rules-sheet-content">
+          <div class="rules-sheet-header">
+            <h3 class="rules-sheet-title">Mission Rules & Controls</h3>
+            <button class="btn-icon" id="btn-close-rules" aria-label="Close Rules">✕</button>
+          </div>
+          <div class="rules-sheet-body">
+            <div class="rule-item">
+              <span class="rule-icon">🎯</span>
+              <div class="rule-text">
+                <strong>Primary Objective</strong>
+                <p>Collect all 3 Star Crystals and navigate the probe into the glowing Wormhole portal event horizon.</p>
+              </div>
+            </div>
+            <div class="rule-item">
+              <span class="rule-icon">🪐</span>
+              <div class="rule-text">
+                <strong>Gravity Assists & Repulsors</strong>
+                <p>Planets bend your trajectory with attractive Newtonian gravity. Violet pulsars push you away. Avoid hazardous asteroids!</p>
+              </div>
+            </div>
+            <div class="rule-item">
+              <span class="rule-icon">🕹️</span>
+              <div class="rule-text">
+                <strong>Touch & On-Screen Controls</strong>
+                <p>• <strong>Aim & Drag:</strong> Drag the probe backwards or use the on-screen <strong>◀ LEFT</strong> / <strong>RIGHT ▶</strong> and <strong>▲ +Power</strong> / <strong>▼ -Power</strong> buttons.<br>
+                • <strong>Launch:</strong> Tap the big glowing <strong>🚀 FIRE PROBE</strong> button or release your drag.</p>
+              </div>
+            </div>
+            <div class="rule-item">
+              <span class="rule-icon">⌨️</span>
+              <div class="rule-text">
+                <strong>Keyboard Shortcuts</strong>
+                <p>• <strong>Launch:</strong> <kbd>SPACE</kbd> or <kbd>ENTER</kbd><br>
+                • <strong>Aim Angle:</strong> <kbd>A</kbd> / <kbd>D</kbd> or <kbd>←</kbd> / <kbd>→</kbd><br>
+                • <strong>Launch Power:</strong> <kbd>W</kbd> / <kbd>S</kbd> or <kbd>↑</kbd> / <kbd>↓</kbd><br>
+                • <strong>Retry:</strong> <kbd>R</kbd> | <strong>Rules:</strong> <kbd>I</kbd> | <strong>Mute:</strong> <kbd>M</kbd> | <strong>Map:</strong> <kbd>ESC</kbd></p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Victory Modal Overlay -->
+      <div class="game-modal" id="modal-victory" role="dialog" aria-modal="true" aria-label="Victory">
+        <img src="../orbital-slingshot-assets/page-4/wormhole.png" alt="Wormhole Jump" class="modal-emblem">
+        <h2 class="modal-title victory">Hyperdrive Jump!</h2>
+        <p class="modal-desc" id="victory-desc">Jump coordinates locked! Hyperdrive jump successful.</p>
+        <div class="modal-stars-row" id="victory-stars-row">
+          <img src="../orbital-slingshot-assets/page-4/star-crystal.png" alt="Star 1" class="modal-star-img">
+          <img src="../orbital-slingshot-assets/page-4/star-crystal.png" alt="Star 2" class="modal-star-img">
+          <img src="../orbital-slingshot-assets/page-4/star-crystal.png" alt="Star 3" class="modal-star-img">
+        </div>
+        <div class="modal-stats">
+          <div class="stat-box">
+            <span class="stat-label">Crystals</span>
+            <span class="stat-value" id="victory-crystals">3/3</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-label">Shots</span>
+            <span class="stat-value" id="victory-shots">1</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-label">Score</span>
+            <span class="stat-value" id="victory-score">2,850</span>
+          </div>
+        </div>
+        <div class="modal-buttons">
+          <button class="btn-primary" id="btn-next-level">Next Sector</button>
+          <button class="btn-secondary" id="btn-replay-level">Replay Sector</button>
+          <button class="btn-secondary" id="btn-victory-map">Sector Map</button>
+        </div>
+      </div>
+
+      <!-- Defeat / Crash Modal Overlay -->
+      <div class="game-modal" id="modal-defeat" role="dialog" aria-modal="true" aria-label="Defeat">
+        <img src="../orbital-slingshot-assets/page-4/asteroid.png" alt="Debris" class="modal-emblem">
+        <h2 class="modal-title defeat">Probe Lost</h2>
+        <p class="modal-desc" id="defeat-reason">Atmospheric Vaporization: Crashed into Terra Nova!</p>
+        <div class="modal-buttons">
+          <button class="btn-primary" id="btn-defeat-retry">Recalibrate & Retry</button>
+          <button class="btn-secondary" id="btn-defeat-map">Sector Map</button>
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- Runtime Scripts -->
+  <script src="orbital-slingshot-core.js?v=1"></script>
+  <script src="orbital-slingshot-audio.js?v=1"></script>
+  <script src="orbital-slingshot.js?v=1"></script>
+</body>
+</html>

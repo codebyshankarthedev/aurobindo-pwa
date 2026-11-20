@@ -1,0 +1,20 @@
+{
+  "name": "aurobindo-pwa",
+  "version": "1.0.0",
+  "description": "Aurobindo PWA and QC Core Mini-Games: Orbital Slingshot & See Saw",
+  "main": "index.html",
+  "scripts": {
+    "test": "node --test tests/orbital-slingshot.test.cjs tests/see-saw.test.cjs",
+    "build": "node build-netlify.js",
+    "start": "npx serve ."
+  },
+  "keywords": [
+    "pwa",
+    "mini-games",
+    "orbital-slingshot",
+    "see-saw"
+  ],
+  "author": "QC Core Team",
+  "license": "UNLICENSED",
+  "private": true
+}

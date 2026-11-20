@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <title>Aurobindo QC Core</title>
+  <style>
+    :root {
+      --bg: #040814;
+      --card-bg: #091326;
+      --cyan: #00d2d3;
+      --gold: #ffd32a;
+      --purple: #9d4edd;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      background: var(--bg);
+      color: #ffffff;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      padding-bottom: 40px;
+      min-height: 100vh;
+    }
+    .app-header {
+      padding: 24px 20px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      border-bottom: 1px solid rgba(0, 210, 211, 0.2);
+    }
+    .header-text {
+      display: flex;
+      flex-direction: column;
+    }
+    .app-title {
+      font-size: 1.5rem;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      background: linear-gradient(90deg, #00d2d3, #9d4edd);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-transform: uppercase;
+    }
+    .app-subtitle {
+      font-size: 0.75rem;
+      color: #8da4be;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .gallery-section {
+      display: block;
+      padding: 24px 20px 12px;
+    }
+    .gallery-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin-bottom: 16px;
+      color: var(--cyan);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .game-gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 240px));
+      gap: 24px;
+      justify-content: center;
+      max-width: 580px;
+      margin: 0 auto;
+    }
+    .game-poster {
+      position: relative;
+      display: block;
+      text-decoration: none;
+      border-radius: 18px;
+      overflow: hidden;
+      border: 1px solid rgba(0, 210, 211, 0.3);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+      transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+      background: var(--card-bg);
+    }
+    .game-poster:hover, .game-poster:focus {
+      transform: translateY(-6px);
+      box-shadow: 0 16px 36px rgba(0, 210, 211, 0.4);
+      border-color: var(--cyan);
+    }
+    .poster-card-wrap {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 9 / 16;
+      background: #060d1a;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+    }
+    .poster-orbital-slingshot .poster-card-wrap {
+      background: radial-gradient(circle at 50% 35%, #1a2a6c 0%, #0d122b 50%, #040814 100%);
+    }
+    .poster-see-saw .poster-card-wrap {
+      background: radial-gradient(circle at 50% 35%, #0f3443 0%, #102027 50%, #040814 100%);
+    }
+    .poster-card-image {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      z-index: 1;
+    }
+    .poster-overlay {
+      position: relative;
+      z-index: 2;
+      padding: 16px 12px 14px;
+      background: linear-gradient(180deg, rgba(4, 8, 20, 0) 0%, rgba(4, 8, 20, 0.85) 40%, rgba(4, 8, 20, 0.98) 100%);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .poster-badge {
+      font-size: 0.65rem;
+      font-weight: 800;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      border-radius: 6px;
+      align-self: flex-start;
+      background: rgba(0, 210, 211, 0.2);
+      color: var(--cyan);
+      border: 1px solid rgba(0, 210, 211, 0.4);
+    }
+    .poster-badge.badge-see-saw {
+      background: rgba(255, 211, 42, 0.2);
+      color: var(--gold);
+      border-color: rgba(255, 211, 42, 0.4);
+    }
+    .poster-title {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: #ffffff;
+      line-height: 1.2;
+    }
+    .poster-cta {
+      font-size: 0.72rem;
+      color: #9bb1c9;
+      margin-top: 2px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .poster-cta span {
+      color: var(--cyan);
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+  <header class="app-header">
+    <div class="header-text">
+      <h1 class="app-title">Aurobindo QC Core</h1>
+      <span class="app-subtitle">Interactive Quality Mini-Games</span>
+    </div>
+
+  </header>
+
+  <!-- ====================================================================
+       FEATURED QUALITY MINI-GAMES (EXACTLY 2 GAMES)
+       ==================================================================== -->
+  <main class="gallery-section active" id="games">
+    <div class="game-gallery">
+      <!-- 1. ORBITAL SLINGSHOT -->
+      <a class="game-poster poster-orbital-slingshot playable-poster"
+         href="assets/orbital-slingshot-scripts/orbital-slingshot.html?v=1&amp;from=games"
+         aria-label="Play Orbital Slingshot">
+        <div class="poster-card-wrap">
+          <img src="assets/orbital-slingshot-assets/page-1/page-1-bg.png"
+               alt="Orbital Slingshot" class="poster-card-image">
+          <div class="poster-overlay">
+            <span class="poster-badge">Astrodynamics</span>
+            <div class="poster-title">Orbital Slingshot</div>
+            <div class="poster-cta"><span>▶</span> Tap to Launch</div>
+          </div>
+        </div>
+      </a>
+
+      <!-- 2. SEE SAW -->
+      <a class="game-poster poster-see-saw playable-poster"
+         href="assets/see-saw-scripts/see-saw.html?v=1&amp;from=games"
+         aria-label="Play See Saw">
+        <div class="poster-card-wrap">
+          <img src="assets/see-saw-assets/page-1/page-1-bg.png"
+               alt="See Saw" class="poster-card-image">
+          <div class="poster-overlay">
+            <span class="poster-badge badge-see-saw">Analytical Lab</span>
+            <div class="poster-title">See Saw</div>
+            <div class="poster-cta"><span>▶</span> Tap to Balance</div>
+          </div>
+        </div>
+      </a>
+    </div>
+  </main>
+
+  <!-- Hidden RC Game Gallery for compatibility and testing (no duplicates displayed) -->
+  <div id="rc-game-gallery" style="display: none !important;" aria-hidden="true">
+    <a class="game-poster poster-orbital-slingshot playable-poster"
+       href="assets/orbital-slingshot-scripts/orbital-slingshot.html?v=1&amp;from=rc-games"
+       aria-label="Play Orbital Slingshot">
+      <div class="poster-card-wrap">
+        <img src="assets/orbital-slingshot-assets/page-1/page-1-bg.png"
+             alt="Orbital Slingshot" class="poster-card-image">
+        <div class="poster-overlay">
+          <span class="poster-badge">Astrodynamics</span>
+          <div class="poster-title">Orbital Slingshot</div>
+          <div class="poster-cta"><span>▶</span> Tap to Launch</div>
+        </div>
+      </div>
+    </a>
+
+    <a class="game-poster poster-see-saw playable-poster"
+       href="assets/see-saw-scripts/see-saw.html?v=1&amp;from=rc-games"
+       aria-label="Play See Saw">
+      <div class="poster-card-wrap">
+        <img src="assets/see-saw-assets/page-1/page-1-bg.png"
+             alt="See Saw" class="poster-card-image">
+        <div class="poster-overlay">
+          <span class="poster-badge badge-see-saw">Analytical Lab</span>
+          <div class="poster-title">See Saw</div>
+          <div class="poster-cta"><span>▶</span> Tap to Balance</div>
+        </div>
+      </div>
+    </a>
+  </div>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js');
+      });
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,42 @@
+# Netlify Deployment Configuration for Aurobindo PWA & QC Core Games
+[build]
+  publish = "."
+  command = "node build-netlify.js"
+
+# Single-Page Application (SPA) routing fallback
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Strict cache control for Service Worker to ensure instant PWA updates
+[[headers]]
+  for = "/sw.js"
+  [headers.values]
+    Cache-Control = "no-cache, no-store, must-revalidate"
+    Pragma = "no-cache"
+    Expires = "0"
+
+# No-cache headers for Orbital Slingshot dynamic scripts & assets
+[[headers]]
+  for = "/assets/orbital-slingshot-*/*"
+  [headers.values]
+    Cache-Control = "no-cache, no-store, must-revalidate"
+    Pragma = "no-cache"
+    Expires = "0"
+
+# No-cache headers for See Saw dynamic scripts & assets
+[[headers]]
+  for = "/assets/see-saw-*/*"
+  [headers.values]
+    Cache-Control = "no-cache, no-store, must-revalidate"
+    Pragma = "no-cache"
+    Expires = "0"
+
+# Main landing index.html header
+[[headers]]
+  for = "/index.html"
+  [headers.values]
+    Cache-Control = "no-cache, no-store, must-revalidate"
+    Pragma = "no-cache"
+    Expires = "0"

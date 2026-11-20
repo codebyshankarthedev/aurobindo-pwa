@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>See Saw — Analytical Torque Balance</title>
+  <link rel="stylesheet" href="see-saw.css?v=1">
+</head>
+<body>
+  <!-- Rotate Device Overlay for Landscape Coarse Viewports -->
+  <div class="rotate-overlay" id="rotate-overlay">
+    <div class="rotate-icon"></div>
+    <div class="rotate-title">Rotate Your Device</div>
+    <div class="rotate-desc">See Saw requires portrait orientation to precisely align laboratory calibration balances.</div>
+  </div>
+
+  <!-- Centered 9:16 Portrait Stage -->
+  <main class="stage" id="stage" role="main">
+
+    <!-- ====================================================================
+         PAGE 1: LANDING & PRELOADER
+         ==================================================================== -->
+    <section class="screen active" id="screen-landing" aria-label="Loading Screen">
+      <img src="../see-saw-assets/page-1/page-1-bg.png" alt="" class="screen-bg" id="landing-bg">
+
+      <header class="landing-top-bar">
+        <button class="btn-icon btn-landing-exit" id="btn-landing-exit" aria-label="Back to Gallery">‹ Exit</button>
+        <button class="btn-icon btn-mute" aria-label="Toggle Sound">🔊</button>
+      </header>
+
+      <div class="landing-header">
+        <img src="../see-saw-assets/page-1/emblem.png" alt="QC Balance Emblem" class="landing-emblem">
+        <h1 class="landing-title">See Saw</h1>
+        <p class="landing-subtitle">Precision Analytical Balance</p>
+      </div>
+
+      <div class="preloader-card">
+        <div class="preloader-label">
+          <span>Analytical Sensor Calibrator</span>
+          <span id="preloader-percent">100%</span>
+        </div>
+        <div class="preloader-bar-bg" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">
+          <div class="preloader-bar-fill" id="preloader-bar-fill" style="width: 100%;"></div>
+        </div>
+        <div class="preloader-status" id="preloader-status">Balance beam sensors calibrated. Ready for analysis.</div>
+      </div>
+
+      <div class="start-btn-wrap" id="start-btn-wrap">
+        <button class="btn-primary" id="btn-quick-play" aria-label="Quick Launch Station 1">⚖️ Launch Balance Lab</button>
+        <button class="btn-secondary" id="btn-start" aria-label="Standard Operating Procedure">🔬 Lab SOP Guide</button>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         PAGE 2: LAB BRIEFING & TUTORIAL
+         ==================================================================== -->
+    <section class="screen" id="screen-tutorial" aria-label="Calibration Briefing">
+      <img src="../see-saw-assets/page-2/story-bg.png" alt="" class="screen-bg">
+
+      <header class="screen-header">
+        <button class="btn-icon" id="btn-tutorial-back" aria-label="Back">‹</button>
+        <div class="header-title-box">
+          <h2 class="header-title">Lab SOP Guide</h2>
+          <span class="header-subtitle">Standard Operating Procedure</span>
+        </div>
+        <button class="btn-icon btn-mute" aria-label="Toggle Sound">🔊</button>
+      </header>
+
+      <div class="tutorial-cards">
+        <div class="tutorial-card">
+          <img src="../see-saw-assets/page-2/torque-guide.png" alt="Torque Equation" class="tutorial-icon">
+          <div class="tutorial-text">
+            <h4>1. Torque Equation</h4>
+            <p>Torque equals mass × distance: τ = m · d. Placing 5g at 2x distance produces a torque of 10.</p>
+          </div>
+        </div>
+
+        <div class="tutorial-card">
+          <img src="../see-saw-assets/page-2/drag-guide.png" alt="Drag Calibration" class="tutorial-icon">
+          <div class="tutorial-text">
+            <h4>2. Drag & Drop Weights</h4>
+            <p>Drag weights from the rack onto beam calibration slots, or click a weight then click a slot.</p>
+          </div>
+        </div>
+
+        <div class="tutorial-card">
+          <img src="../see-saw-assets/page-2/balance-guide.png" alt="Equilibrium Indicator" class="tutorial-icon">
+          <div class="tutorial-text">
+            <h4>3. Zero Tilt Equilibrium</h4>
+            <p>Balance the seesaw beam until the dial needle hits 0° center and locks in equilibrium.</p>
+          </div>
+        </div>
+
+        <div class="tutorial-card">
+          <img src="../see-saw-assets/page-2/stars-guide.png" alt="QC Stars" class="tutorial-icon">
+          <div class="tutorial-text">
+            <h4>4. Par Efficiency</h4>
+            <p>Achieve equilibrium within par moves and under time target to earn 3 Laboratory Stars.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="tutorial-footer" style="display: flex; justify-content: center; margin-top: 16px;">
+        <button class="btn-primary" id="btn-tutorial-continue" aria-label="Enter Laboratories">Enter Laboratories</button>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         PAGE 3: STATION LEVEL MAP
+         ==================================================================== -->
+    <section class="screen" id="screen-map" aria-label="Station Selection Map">
+      <img src="../see-saw-assets/page-3/map-bg.png" alt="" class="screen-bg">
+
+      <header class="map-top-bar">
+        <button class="btn-icon" id="btn-map-exit" aria-label="Exit Game">✕</button>
+        <div class="star-tally">
+          <img src="../see-saw-assets/page-4/equilibrium-glow.png" alt="Stars" class="star-tally-icon">
+          <span class="star-tally-count" id="total-stars-count">0 / 36</span>
+        </div>
+        <button class="btn-icon btn-mute" aria-label="Toggle Sound">🔊</button>
+      </header>
+
+      <div class="map-scroll-container" id="levels-container">
+        <!-- Populated dynamically -->
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         PAGE 4: ANALYTICAL BALANCE STATION (GAMEPLAY)
+         ==================================================================== -->
+    <section class="screen" id="screen-game" aria-label="Analytical Balance Station">
+      <img src="../see-saw-assets/page-4/lab-backdrop.png" alt="" class="screen-bg">
+
+      <!-- Top HUD -->
+      <header class="game-hud">
+        <button class="btn-icon btn-hud-action" id="btn-game-map" aria-label="Back to Station Map">🗺️ Map</button>
+        <div class="hud-center">
+          <div class="hud-level-title" id="hud-level-name">Station 1: Calibration Basics</div>
+          <div class="hud-torque-status" id="hud-torque-status">L: 10 | R: 0 (Imbalance: -10)</div>
+        </div>
+        <div class="hud-right" style="display: flex; gap: 6px; align-items: center;">
+          <div class="hud-moves-pill" id="hud-moves-pill">MOVES: 0/1</div>
+          <button class="btn-icon" id="btn-game-retry" aria-label="Reset Balance">↺</button>
+          <button class="btn-icon btn-mute" aria-label="Toggle Sound">🔊</button>
+          <button class="btn-icon" id="btn-game-exit" aria-label="Exit to Gallery">✕</button>
+        </div>
+      </header>
+
+      <!-- Central Seesaw Arena -->
+      <div class="seesaw-arena">
+        <!-- Needle Dial -->
+        <div class="indicator-dial">
+          <div class="dial-pointer" id="dial-pointer"></div>
+        </div>
+
+        <!-- Pivoting Seesaw Beam -->
+        <div class="seesaw-beam-pivot" id="seesaw-beam-pivot">
+          <img src="../see-saw-assets/page-4/seesaw-beam.png" alt="Balance Beam" class="seesaw-beam-img">
+          <!-- 6 Calibration Slots -->
+          <div class="beam-slots">
+            <div class="beam-slot" id="slot-L-3" data-slot="L-3"><span class="slot-tag">3x</span></div>
+            <div class="beam-slot" id="slot-L-2" data-slot="L-2"><span class="slot-tag">2x</span></div>
+            <div class="beam-slot" id="slot-L-1" data-slot="L-1"><span class="slot-tag">1x</span></div>
+            <div class="beam-slot" id="slot-R-1" data-slot="R-1"><span class="slot-tag">1x</span></div>
+            <div class="beam-slot" id="slot-R-2" data-slot="R-2"><span class="slot-tag">2x</span></div>
+            <div class="beam-slot" id="slot-R-3" data-slot="R-3"><span class="slot-tag">3x</span></div>
+          </div>
+        </div>
+
+        <!-- Stationary Fulcrum -->
+        <div class="fulcrum-wrap">
+          <img src="../see-saw-assets/page-4/seesaw-fulcrum.png" alt="Fulcrum" class="fulcrum-img">
+        </div>
+      </div>
+
+      <!-- Bottom Calibration Rack (Tray of Draggable & Clickable Weights) -->
+      <div class="rack-tray">
+        <div class="rack-header">Available Calibration Weights</div>
+        <div class="rack-weights-list" id="rack-weights-list">
+          <!-- Populated dynamically -->
+        </div>
+
+        <!-- Interactive Tactile Action Strip -->
+        <div class="seesaw-controls-strip">
+          <button class="btn-action-pill" id="btn-auto-balance" aria-label="Auto-Balance Optimal Weight">
+            ⚡ Balance <kbd>SPACE</kbd>
+          </button>
+          <button class="btn-action-pill" id="btn-undo-move" aria-label="Undo Last Weight">
+            ↶ Undo <kbd>⌫</kbd>
+          </button>
+          <button class="btn-action-pill" id="btn-reset-rack" aria-label="Reset Weights">
+            ↺ Reset <kbd>R</kbd>
+          </button>
+          <button class="btn-info-toggle" id="btn-see-saw-rules" aria-label="Laboratory SOP Rules">
+            ℹ️ Rules <kbd>I</kbd>
+          </button>
+        </div>
+      </div>
+
+      <!-- Laboratory Balance Rules Modal -->
+      <div class="rules-modal" id="modal-rules" role="dialog" aria-modal="true" aria-label="Laboratory SOP Rules">
+        <div class="rules-sheet-content">
+          <div class="rules-sheet-header">
+            <h3 class="rules-sheet-title">Analytical Balance SOP</h3>
+            <button class="btn-icon" id="btn-close-rules" aria-label="Close Rules">✕</button>
+          </div>
+          <div class="rules-sheet-body">
+            <div class="rule-item">
+              <span class="rule-icon">⚖️</span>
+              <div class="rule-text">
+                <strong>Analytical Torque Formula</strong>
+                <p>Torque = Mass × Distance (&tau; = m &middot; d). Placing 5g on slot 2x creates 10 torque. Balance left and right sides so the dial needle stops at 0.00&deg;.</p>
+              </div>
+            </div>
+            <div class="rule-item">
+              <span class="rule-icon">🧪</span>
+              <div class="rule-text">
+                <strong>Controls & Actions</strong>
+                <p>• <strong>Touch / Mouse:</strong> Drag weights from the tray to any slot, OR tap a weight then tap a beam slot.<br>
+                • <strong>Quick Keys:</strong> Press <kbd>1</kbd>–<kbd>3</kbd> for left slots, <kbd>4</kbd>–<kbd>6</kbd> for right slots.<br>
+                • <strong>Auto-Balance:</strong> Tap the ⚡ <strong>Balance</strong> button or press <kbd>SPACE</kbd> / <kbd>ENTER</kbd>.<br>
+                • <strong>Undo / Remove:</strong> Press <kbd>Backspace</kbd> or tap <strong>Undo</strong>.<br>
+                • <strong>Reset Station:</strong> Press <kbd>R</kbd>.<br>
+                • <strong>Mute:</strong> Press <kbd>M</kbd> | <strong>Exit:</strong> <kbd>ESC</kbd>.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Victory Modal -->
+      <div class="game-modal" id="modal-victory" role="dialog" aria-modal="true" aria-label="Victory">
+        <img src="../see-saw-assets/page-4/equilibrium-glow.png" alt="Equilibrium" class="modal-emblem">
+        <h2 class="modal-title">Equilibrium Verified!</h2>
+        <p class="modal-desc">Analytical torque balance stabilized at 0.00° deviation.</p>
+        <div class="modal-stars-row" id="victory-stars-row">
+          <img src="../see-saw-assets/page-4/equilibrium-glow.png" alt="Star 1" class="modal-star-img">
+          <img src="../see-saw-assets/page-4/equilibrium-glow.png" alt="Star 2" class="modal-star-img">
+          <img src="../see-saw-assets/page-4/equilibrium-glow.png" alt="Star 3" class="modal-star-img">
+        </div>
+        <div class="modal-stats">
+          <div class="stat-box">
+            <span class="stat-label">Moves</span>
+            <span class="stat-value" id="victory-moves">1</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-label">Score</span>
+            <span class="stat-value" id="victory-score">2,500</span>
+          </div>
+        </div>
+        <div class="modal-buttons">
+          <button class="btn-primary" id="btn-next-level">Next Station</button>
+          <button class="btn-secondary" id="btn-replay-level">Replay Station</button>
+          <button class="btn-secondary" id="btn-victory-map">Station Map</button>
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- Runtime Scripts -->
+  <script src="see-saw-core.js?v=1"></script>
+  <script src="see-saw-audio.js?v=1"></script>
+  <script src="see-saw.js?v=1"></script>
+</body>
+</html>
