@@ -93,7 +93,7 @@
       sector: 'Sol Gateway',
       sectorBadge: 'sector-earth',
       parShots: 2,
-      probeStart: { x: 50, y: 84 },
+      probeStart: { x: 50, y: 78 },
       wormhole: { x: 50, y: 16, radius: CONSTANTS.WORMHOLE_RADIUS },
       planets: [
         { name: 'Terra Nova', type: 'terran', x: 50, y: 50, radius: 8.5, mass: 28, texture: 'planet-terran.png' }
@@ -111,7 +111,7 @@
       sector: 'Sol Gateway',
       sectorBadge: 'sector-earth',
       parShots: 2,
-      probeStart: { x: 25, y: 84 },
+      probeStart: { x: 25, y: 78 },
       wormhole: { x: 75, y: 18, radius: CONSTANTS.WORMHOLE_RADIUS },
       planets: [
         { name: 'Earth Prime', type: 'terran', x: 42, y: 54, radius: 8.0, mass: 26, texture: 'planet-terran.png' },
@@ -130,7 +130,7 @@
       sector: 'Martian Belt',
       sectorBadge: 'sector-mars',
       parShots: 2,
-      probeStart: { x: 75, y: 84 },
+      probeStart: { x: 75, y: 78 },
       wormhole: { x: 25, y: 16, radius: CONSTANTS.WORMHOLE_RADIUS },
       planets: [
         { name: 'Ares Prime', type: 'lava', x: 50, y: 50, radius: 8.0, mass: 25, texture: 'planet-lava.png' }
@@ -150,7 +150,7 @@
       sector: 'Martian Belt',
       sectorBadge: 'sector-mars',
       parShots: 2,
-      probeStart: { x: 50, y: 86 },
+      probeStart: { x: 50, y: 78 },
       wormhole: { x: 50, y: 14, radius: CONSTANTS.WORMHOLE_RADIUS },
       planets: [
         { name: 'Ceres Core', type: 'terran', x: 50, y: 52, radius: 7.5, mass: 24, texture: 'planet-terran.png' }
@@ -171,7 +171,7 @@
       sector: 'Jovian Ring',
       sectorBadge: 'sector-jupiter',
       parShots: 2,
-      probeStart: { x: 30, y: 85 },
+      probeStart: { x: 30, y: 78 },
       wormhole: { x: 70, y: 15, radius: CONSTANTS.WORMHOLE_RADIUS },
       planets: [
         { name: 'Helios Attractor', type: 'gas-giant', x: 65, y: 55, radius: 9.0, mass: 32, texture: 'planet-gas-giant.png' },
@@ -190,7 +190,7 @@
       sector: 'Jovian Ring',
       sectorBadge: 'sector-jupiter',
       parShots: 2,
-      probeStart: { x: 50, y: 88 },
+      probeStart: { x: 50, y: 78 },
       wormhole: { x: 50, y: 12, radius: CONSTANTS.WORMHOLE_RADIUS },
       planets: [
         { name: 'Jove Massive', type: 'gas-giant', x: 50, y: 48, radius: 11.0, mass: 42, texture: 'planet-gas-giant.png' }
@@ -211,7 +211,7 @@
       sector: 'Saturnian Abyss',
       sectorBadge: 'sector-saturn',
       parShots: 3,
-      probeStart: { x: 20, y: 84 },
+      probeStart: { x: 20, y: 78 },
       wormhole: { x: 80, y: 16, radius: CONSTANTS.WORMHOLE_RADIUS },
       planets: [
         { name: 'Cronus Gold', type: 'gas-giant', x: 50, y: 50, radius: 9.5, mass: 34, texture: 'planet-gas-giant.png', rings: true }
@@ -232,7 +232,7 @@
       sector: 'Saturnian Abyss',
       sectorBadge: 'sector-uranus',
       parShots: 2,
-      probeStart: { x: 50, y: 86 },
+      probeStart: { x: 50, y: 78 },
       wormhole: { x: 50, y: 15, radius: CONSTANTS.WORMHOLE_RADIUS },
       planets: [
         { name: 'Titania Ice', type: 'ice', x: 32, y: 48, radius: 7.5, mass: 22, texture: 'planet-ice.png' },
@@ -253,7 +253,7 @@
       sector: 'Neptunian Deep',
       sectorBadge: 'sector-neptune',
       parShots: 2,
-      probeStart: { x: 50, y: 88 },
+      probeStart: { x: 50, y: 78 },
       wormhole: { x: 50, y: 14, radius: CONSTANTS.WORMHOLE_RADIUS },
       planets: [
         { name: 'Pulsar Alpha', type: 'pulsar', x: 26, y: 52, radius: 6.5, mass: -20, texture: 'planet-pulsar.png' },
@@ -273,7 +273,7 @@
       sector: 'Deep Void',
       sectorBadge: 'sector-void',
       parShots: 3,
-      probeStart: { x: 50, y: 86 },
+      probeStart: { x: 50, y: 78 },
       wormhole: { x: 50, y: 15, radius: CONSTANTS.WORMHOLE_RADIUS },
       planets: [
         { name: 'Inferno', type: 'lava', x: 28, y: 60, radius: 7.0, mass: 24, texture: 'planet-lava.png' },
@@ -293,7 +293,7 @@
       sector: 'Deep Void',
       sectorBadge: 'sector-void',
       parShots: 3,
-      probeStart: { x: 22, y: 84 },
+      probeStart: { x: 22, y: 78 },
       wormhole: { x: 78, y: 16, radius: CONSTANTS.WORMHOLE_RADIUS },
       planets: [
         { name: 'Eclipse Star', type: 'gas-giant', x: 50, y: 50, radius: 9.0, mass: 35, texture: 'planet-gas-giant.png' },
@@ -315,7 +315,7 @@
       sector: 'Deep Void',
       sectorBadge: 'sector-void',
       parShots: 3,
-      probeStart: { x: 50, y: 88 },
+      probeStart: { x: 50, y: 78 },
       wormhole: { x: 50, y: 12, radius: CONSTANTS.WORMHOLE_RADIUS },
       planets: [
         { name: 'Singularity Zero', type: 'gas-giant', x: 50, y: 50, radius: 10.5, mass: 48, texture: 'planet-gas-giant.png' },

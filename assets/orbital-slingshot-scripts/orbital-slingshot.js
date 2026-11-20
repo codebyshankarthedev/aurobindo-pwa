@@ -233,7 +233,7 @@
       `;
 
       if (isUnlocked) {
-        card.addEventListener('click', () => {
+        addTapListener(card, () => {
           isEndlessMode = false;
           startLevel(level);
         });
@@ -259,7 +259,7 @@
           <button class="btn-secondary" style="padding: 6px 12px; font-size: 11px;">WARP</button>
         </div>
       `;
-      endlessCard.addEventListener('click', () => {
+      addTapListener(endlessCard, () => {
         isEndlessMode = true;
         endlessIndex = 13;
         const procedural = Core.generateProceduralLevel(endlessIndex);
@@ -289,7 +289,7 @@
       `;
 
       if (isUnlocked) {
-        item.addEventListener('click', () => {
+        addTapListener(item, () => {
           saveData.equippedTrail = trail.id;
           Core.saveGameData(window.localStorage, saveData);
           renderHangarTrails();
@@ -330,7 +330,7 @@
       x: Math.max(-12, Math.min(12, -toWormholeX * 0.15)),
       y: 9.0
     };
-    isAiming = true;
+    isAiming = false;
 
     modalVictory.classList.remove('active');
     modalDefeat.classList.remove('active');
@@ -380,19 +380,19 @@
 
   slingshotHitpad.addEventListener('pointerdown', (e) => {
     if (!gameState || gameState.probe.active || gameState.status !== 'aiming') return;
-    e.preventDefault();
+    if (e.cancelable) e.preventDefault();
     isAiming = true;
     activePointerId = e.pointerId;
 
     const isTouch = e.pointerType === 'touch';
     pullStart = getStageCoords(e.clientX, e.clientY, isTouch);
     pullCurrent = { ...pullStart };
-    pullDeltaPct = { x: 0, y: 0 };
+    // Keep existing pullDeltaPct so trajectory arc stays visible while adjusting
   });
 
   window.addEventListener('pointermove', (e) => {
     if (!isAiming || e.pointerId !== activePointerId) return;
-    e.preventDefault();
+    if (e.cancelable) e.preventDefault();
 
     const isTouch = e.pointerType === 'touch';
     pullCurrent = getStageCoords(e.clientX, e.clientY, isTouch);
@@ -413,40 +413,55 @@
 
   window.addEventListener('pointerup', (e) => {
     if (!isAiming || e.pointerId !== activePointerId) return;
-    e.preventDefault();
+    if (e.cancelable) e.preventDefault();
     isAiming = false;
     activePointerId = null;
 
     const pullDist = Math.hypot(pullDeltaPct.x, pullDeltaPct.y);
-    if (pullDist >= Core.CONSTANTS.MIN_LAUNCH_PULL) {
-      gameState.probe.active = true;
-      gameState.probe.alive = true;
-      gameState.probe.vx = -pullDeltaPct.x * Core.CONSTANTS.SLINGSHOT_FORCE_SCALE;
-      gameState.probe.vy = -pullDeltaPct.y * Core.CONSTANTS.SLINGSHOT_FORCE_SCALE;
-      gameState.shotsUsed++;
-      gameState.status = 'flying';
-      trailPoints = [];
+    const dragMovement = Math.hypot(pullCurrent.x - pullStart.x, pullCurrent.y - pullStart.y);
 
-      audio.playSfx('launch');
-      updateHud();
-      updateTelemetry();
-      triggerScreenRumble();
+    if (dragMovement >= Core.CONSTANTS.MIN_LAUNCH_PULL && pullDist >= Core.CONSTANTS.MIN_LAUNCH_PULL) {
+      // Intentional drag launch
+      launchProbe();
+    } else {
+      // Tap without drag: If tapped above probe, point trajectory toward tapped target!
+      const isTouch = e.pointerType === 'touch';
+      const tapCoords = getStageCoords(e.clientX, e.clientY, isTouch);
+      if (tapCoords.y < (gameState.probeStart.y - 3)) {
+        const targetDx = tapCoords.x - gameState.probeStart.x;
+        const targetDy = tapCoords.y - gameState.probeStart.y;
+        // Launch velocity will be -pullDeltaPct * SLINGSHOT_FORCE_SCALE
+        const scale = 0.22;
+        const maxR = Core.CONSTANTS.MAX_PULL_RADIUS;
+        let px = -targetDx * scale;
+        let py = -targetDy * scale;
+        const d = Math.hypot(px, py);
+        if (d > maxR) {
+          px = (px / d) * maxR;
+          py = (py / d) * maxR;
+        }
+        pullDeltaPct = { x: px, y: Math.max(Core.CONSTANTS.MIN_LAUNCH_PULL, py) };
+        updateTelemetry();
+      } else if (pullDist < Core.CONSTANTS.MIN_LAUNCH_PULL) {
+        pullDeltaPct = { x: 0, y: 9.0 };
+        updateTelemetry();
+      }
     }
-
-    pullDeltaPct = { x: 0, y: 0 };
-    updateTelemetry();
   });
 
   window.addEventListener('pointercancel', (e) => {
     if (e.pointerId === activePointerId) {
       isAiming = false;
       activePointerId = null;
-      pullDeltaPct = { x: 0, y: 0 };
+      if (Math.hypot(pullDeltaPct.x, pullDeltaPct.y) < Core.CONSTANTS.MIN_LAUNCH_PULL) {
+        pullDeltaPct = { x: 0, y: 9.0 };
+      }
+      updateTelemetry();
     }
   });
 
   window.addEventListener('touchmove', (e) => {
-    if (isAiming) e.preventDefault();
+    if (activePointerId !== null) e.preventDefault();
   }, { passive: false });
 
   // --- 6. GAME ANIMATION LOOP & PHYSICS ---
@@ -769,8 +784,8 @@
     });
     ctx.globalAlpha = 1.0;
 
-    // 8. Draw Predictive Trajectory Arc (While Aiming)
-    if (isAiming && Math.hypot(pullDeltaPct.x, pullDeltaPct.y) >= Core.CONSTANTS.MIN_LAUNCH_PULL) {
+    // 8. Draw Predictive Trajectory Arc (While Aiming or Pre-aimed)
+    if (!gameState.probe.active && gameState.status === 'aiming' && Math.hypot(pullDeltaPct.x, pullDeltaPct.y) >= Core.CONSTANTS.MIN_LAUNCH_PULL) {
       const trajectory = Core.computeTrajectory(
         gameState.probeStart,
         pullDeltaPct,
@@ -789,19 +804,21 @@
       ctx.stroke();
       ctx.setLineDash([]);
 
-      // Slingshot Band
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.85)';
-      ctx.lineWidth = 1.0;
-      ctx.beginPath();
-      ctx.moveTo(gameState.probeStart.x, gameState.probeStart.y);
-      ctx.lineTo(gameState.probeStart.x + pullDeltaPct.x, gameState.probeStart.y + pullDeltaPct.y);
-      ctx.stroke();
+      // Slingshot Band & Reticle
+      if (isAiming) {
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.85)';
+        ctx.lineWidth = 1.0;
+        ctx.beginPath();
+        ctx.moveTo(gameState.probeStart.x, gameState.probeStart.y);
+        ctx.lineTo(gameState.probeStart.x + pullDeltaPct.x, gameState.probeStart.y + pullDeltaPct.y);
+        ctx.stroke();
 
-      // Drag Reticle
-      ctx.fillStyle = '#00f0ff';
-      ctx.beginPath();
-      ctx.arc(gameState.probeStart.x + pullDeltaPct.x, gameState.probeStart.y + pullDeltaPct.y, 2.5, 0, Math.PI * 2);
-      ctx.fill();
+        // Drag Reticle
+        ctx.fillStyle = '#00f0ff';
+        ctx.beginPath();
+        ctx.arc(gameState.probeStart.x + pullDeltaPct.x, gameState.probeStart.y + pullDeltaPct.y, 2.5, 0, Math.PI * 2);
+        ctx.fill();
+      }
     }
 
     // 9. Draw Probe Spacecraft
@@ -923,127 +940,156 @@
     }
   }
 
+  // --- UNIVERSAL MOBILE TOUCH & TAP ENGINE ---
+  function addTapListener(el, callback) {
+    if (!el) return;
+    let isDown = false;
+    let startX = 0;
+    let startY = 0;
+    let lastTime = 0;
+
+    function fire(e) {
+      const now = Date.now();
+      if (now - lastTime < 180) return;
+      lastTime = now;
+      if (e.cancelable) e.preventDefault();
+      e.stopPropagation();
+      callback(e);
+    }
+
+    el.addEventListener('pointerdown', (e) => {
+      isDown = true;
+      startX = e.clientX;
+      startY = e.clientY;
+      el.classList.add('active-press');
+    }, { passive: true });
+
+    el.addEventListener('pointerup', (e) => {
+      if (!isDown) return;
+      isDown = false;
+      el.classList.remove('active-press');
+      const dist = Math.hypot(e.clientX - startX, e.clientY - startY);
+      if (dist < 28) {
+        fire(e);
+      }
+    });
+
+    el.addEventListener('pointercancel', () => {
+      isDown = false;
+      el.classList.remove('active-press');
+    });
+
+    el.addEventListener('click', (e) => {
+      fire(e);
+    });
+  }
+
+  function addRepeatTapListener(el, onStep) {
+    if (!el) return;
+    let timer = null;
+    let isDown = false;
+
+    function startHolding(e) {
+      isDown = true;
+      el.classList.add('active-press');
+      onStep();
+      timer = setTimeout(() => {
+        timer = setInterval(onStep, 90);
+      }, 240);
+    }
+
+    function stopHolding() {
+      if (!isDown) return;
+      isDown = false;
+      el.classList.remove('active-press');
+      if (timer) {
+        clearTimeout(timer);
+        clearInterval(timer);
+      }
+      timer = null;
+    }
+
+    el.addEventListener('pointerdown', (e) => {
+      if (e.cancelable) e.preventDefault();
+      e.stopPropagation();
+      startHolding(e);
+    });
+
+    window.addEventListener('pointerup', stopHolding);
+    window.addEventListener('pointercancel', stopHolding);
+  }
+
   function setupEventListeners() {
     // Page 1: Landing Exit & Direct Play
-    const btnLandingExit = document.getElementById('btn-landing-exit');
-    if (btnLandingExit) btnLandingExit.addEventListener('click', exitGame);
-
-    const btnQuick = document.getElementById('btn-quick-play');
-    if (btnQuick) {
-      btnQuick.addEventListener('click', () => {
-        startLevel(Core.LEVELS[0]);
-      });
-    }
-
-    const btnStart = document.getElementById('btn-start');
-    if (btnStart) {
-      btnStart.addEventListener('click', () => {
-        showScreen('tutorial');
-      });
-    }
+    addTapListener(document.getElementById('btn-landing-exit'), exitGame);
+    addTapListener(document.getElementById('btn-quick-play'), () => startLevel(Core.LEVELS[0]));
+    addTapListener(document.getElementById('btn-start'), () => showScreen('tutorial'));
 
     // Page 2: Tutorial
-    document.getElementById('btn-tutorial-back').addEventListener('click', () => {
-      showScreen('landing');
-    });
-    document.getElementById('btn-tutorial-continue').addEventListener('click', () => {
-      showScreen('map');
-    });
+    addTapListener(document.getElementById('btn-tutorial-back'), () => showScreen('landing'));
+    addTapListener(document.getElementById('btn-tutorial-continue'), () => showScreen('map'));
 
     // Page 3: Map
-    document.getElementById('btn-map-exit').addEventListener('click', exitGame);
+    addTapListener(document.getElementById('btn-map-exit'), exitGame);
 
     const hangarDrawer = document.getElementById('hangar-drawer');
-    document.getElementById('btn-open-hangar').addEventListener('click', () => {
+    addTapListener(document.getElementById('btn-open-hangar'), () => {
       hangarDrawer.classList.add('open');
     });
-    document.getElementById('btn-close-hangar').addEventListener('click', () => {
+    addTapListener(document.getElementById('btn-close-hangar'), () => {
       hangarDrawer.classList.remove('open');
     });
 
     // Page 4: Game HUD & Direct Exit
-    document.getElementById('btn-game-map').addEventListener('click', () => {
-      showScreen('map');
+    addTapListener(document.getElementById('btn-game-map'), () => showScreen('map'));
+    addTapListener(document.getElementById('btn-game-exit'), exitGame);
+    addTapListener(document.getElementById('btn-game-retry'), () => startLevel(activeLevel));
+
+    // Tactile Flight Deck Buttons (Continuous Steering & Instant Fire)
+    addTapListener(document.getElementById('btn-launch-fire'), () => {
+      flashButton('btn-launch-fire');
+      launchProbe();
     });
-    const btnGameExit = document.getElementById('btn-game-exit');
-    if (btnGameExit) btnGameExit.addEventListener('click', exitGame);
 
-    document.getElementById('btn-game-retry').addEventListener('click', () => {
-      startLevel(activeLevel);
+    addRepeatTapListener(document.getElementById('btn-steer-left'), () => {
+      const maxR = Core.CONSTANTS.MAX_PULL_RADIUS;
+      pullDeltaPct.x = Math.min(maxR, pullDeltaPct.x + 3.0);
+      updateTelemetry();
+      flashButton('btn-steer-left');
     });
 
-    // Tactile Flight Deck Buttons
-    const btnFire = document.getElementById('btn-launch-fire');
-    if (btnFire) {
-      btnFire.addEventListener('click', (e) => {
-        e.preventDefault();
-        launchProbe();
-      });
-    }
+    addRepeatTapListener(document.getElementById('btn-steer-right'), () => {
+      const maxR = Core.CONSTANTS.MAX_PULL_RADIUS;
+      pullDeltaPct.x = Math.max(-maxR, pullDeltaPct.x - 3.0);
+      updateTelemetry();
+      flashButton('btn-steer-right');
+    });
 
-    const btnSteerL = document.getElementById('btn-steer-left');
-    if (btnSteerL) {
-      btnSteerL.addEventListener('click', (e) => {
-        e.preventDefault();
-        const maxR = Core.CONSTANTS.MAX_PULL_RADIUS;
-        pullDeltaPct.x = Math.min(maxR, pullDeltaPct.x + 3.0);
-        isAiming = true;
-        updateTelemetry();
-        flashButton('btn-steer-left');
-      });
-    }
+    addRepeatTapListener(document.getElementById('btn-power-up'), () => {
+      const maxR = Core.CONSTANTS.MAX_PULL_RADIUS;
+      pullDeltaPct.y = Math.min(maxR, pullDeltaPct.y + 3.0);
+      updateTelemetry();
+      flashButton('btn-power-up');
+    });
 
-    const btnSteerR = document.getElementById('btn-steer-right');
-    if (btnSteerR) {
-      btnSteerR.addEventListener('click', (e) => {
-        e.preventDefault();
-        const maxR = Core.CONSTANTS.MAX_PULL_RADIUS;
-        pullDeltaPct.x = Math.max(-maxR, pullDeltaPct.x - 3.0);
-        isAiming = true;
-        updateTelemetry();
-        flashButton('btn-steer-right');
-      });
-    }
+    addRepeatTapListener(document.getElementById('btn-power-down'), () => {
+      pullDeltaPct.y = Math.max(Core.CONSTANTS.MIN_LAUNCH_PULL, pullDeltaPct.y - 3.0);
+      updateTelemetry();
+      flashButton('btn-power-down');
+    });
 
-    const btnPowerUp = document.getElementById('btn-power-up');
-    if (btnPowerUp) {
-      btnPowerUp.addEventListener('click', (e) => {
-        e.preventDefault();
-        const maxR = Core.CONSTANTS.MAX_PULL_RADIUS;
-        pullDeltaPct.y = Math.min(maxR, pullDeltaPct.y + 3.0);
-        isAiming = true;
-        updateTelemetry();
-        flashButton('btn-power-up');
-      });
-    }
-
-    const btnPowerDown = document.getElementById('btn-power-down');
-    if (btnPowerDown) {
-      btnPowerDown.addEventListener('click', (e) => {
-        e.preventDefault();
-        pullDeltaPct.y = Math.max(Core.CONSTANTS.MIN_LAUNCH_PULL, pullDeltaPct.y - 3.0);
-        isAiming = true;
-        updateTelemetry();
-        flashButton('btn-power-down');
-      });
-    }
-
-    const btnCenter = document.getElementById('btn-recenter-aim');
-    if (btnCenter) {
-      btnCenter.addEventListener('click', (e) => {
-        e.preventDefault();
-        pullDeltaPct = { x: 0, y: 9.0 };
-        isAiming = true;
-        updateTelemetry();
-        flashButton('btn-recenter-aim');
-      });
-    }
+    addTapListener(document.getElementById('btn-recenter-aim'), () => {
+      pullDeltaPct = { x: 0, y: 9.0 };
+      updateTelemetry();
+      flashButton('btn-recenter-aim');
+    });
 
     // Canvas click-to-aim for full screen responsiveness
     canvas.addEventListener('pointerdown', (e) => {
       if (!gameState || gameState.probe.active || gameState.status !== 'aiming') return;
       const coords = getStageCoords(e.clientX, e.clientY, e.pointerType === 'touch');
-      if (coords.y > 45) { // Any touch in bottom 55% of the screen
+      if (coords.y >= 8 && coords.y <= 92) {
+        if (e.cancelable) e.preventDefault();
         isAiming = true;
         activePointerId = e.pointerId;
         pullStart = coords;
@@ -1052,7 +1098,7 @@
     });
 
     // Modals
-    document.getElementById('btn-next-level').addEventListener('click', () => {
+    addTapListener(document.getElementById('btn-next-level'), () => {
       if (isEndlessMode) {
         endlessIndex++;
         startLevel(Core.generateProceduralLevel(endlessIndex));
@@ -1065,23 +1111,15 @@
         }
       }
     });
-    document.getElementById('btn-replay-level').addEventListener('click', () => {
-      startLevel(activeLevel);
-    });
-    document.getElementById('btn-victory-map').addEventListener('click', () => {
-      showScreen('map');
-    });
 
-    document.getElementById('btn-defeat-retry').addEventListener('click', () => {
-      startLevel(activeLevel);
-    });
-    document.getElementById('btn-defeat-map').addEventListener('click', () => {
-      showScreen('map');
-    });
+    addTapListener(document.getElementById('btn-replay-level'), () => startLevel(activeLevel));
+    addTapListener(document.getElementById('btn-victory-map'), () => showScreen('map'));
+    addTapListener(document.getElementById('btn-defeat-retry'), () => startLevel(activeLevel));
+    addTapListener(document.getElementById('btn-defeat-map'), () => showScreen('map'));
 
     // Mute Toggles
     document.querySelectorAll('.btn-mute').forEach(btn => {
-      btn.addEventListener('click', () => {
+      addTapListener(btn, () => {
         const muted = audio.toggleMute();
         saveData.soundMuted = muted;
         Core.saveGameData(window.localStorage, saveData);
@@ -1103,10 +1141,10 @@
     const btnInfo = document.getElementById('btn-info-toggle');
     const btnCloseRules = document.getElementById('btn-close-rules');
     if (btnInfo && modalRules) {
-      btnInfo.addEventListener('click', () => modalRules.classList.add('active'));
+      addTapListener(btnInfo, () => modalRules.classList.add('active'));
     }
     if (btnCloseRules && modalRules) {
-      btnCloseRules.addEventListener('click', () => modalRules.classList.remove('active'));
+      addTapListener(btnCloseRules, () => modalRules.classList.remove('active'));
     }
 
     // Keyboard Controls (Desktop & Accessibility)

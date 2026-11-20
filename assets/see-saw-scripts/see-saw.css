@@ -652,13 +652,38 @@ img {
   display: flex;
   align-items: flex-end;
   justify-content: center;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
   transition: border-color 0.15s ease, background 0.15s ease, transform 0.15s ease;
+}
+
+.beam-slot::before {
+  content: "";
+  position: absolute;
+  top: -12px;
+  left: -12px;
+  right: -12px;
+  bottom: -12px;
 }
 
 .beam-slot.hover-target {
   border-color: var(--color-teal);
   background: rgba(0, 210, 211, 0.25);
   transform: scale(1.1);
+}
+
+.beam-slot.slot-ready {
+  border-color: #00d2d3 !important;
+  border-style: solid !important;
+  background: rgba(0, 210, 211, 0.28) !important;
+  box-shadow: 0 0 14px rgba(0, 210, 211, 0.7);
+  animation: slotPulse 1.2s infinite alternate;
+}
+
+@keyframes slotPulse {
+  0% { transform: scale(1); }
+  100% { transform: scale(1.08); }
 }
 
 .beam-slot.occupied {
@@ -925,8 +950,62 @@ img {
 }
 
 /* ==========================================================================
-   SEE-SAW CONTROLS STRIP & SOP RULES MODAL
+   QUICK SLOTS STRIP & ACTIONS STRIP FOR MOBILE ERGONOMICS
    ========================================================================== */
+.quick-slots-strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: calc(1 * var(--u));
+  margin-top: calc(0.8 * var(--u));
+  padding-top: calc(0.6 * var(--u));
+}
+
+.btn-slot-pill {
+  flex: 1;
+  background: rgba(14, 26, 48, 0.9);
+  border: 1px solid rgba(0, 210, 211, 0.35);
+  color: #c4e4eb;
+  border-radius: calc(1.4 * var(--u));
+  padding: calc(0.6 * var(--u)) calc(0.4 * var(--u));
+  font-size: calc(1.9 * var(--u));
+  font-weight: 800;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  transition: transform 0.1s ease, background 0.1s ease, border-color 0.1s ease, box-shadow 0.1s ease;
+}
+
+.btn-slot-pill .slot-factor {
+  font-size: calc(1.4 * var(--u));
+  color: var(--color-teal);
+  font-weight: 700;
+}
+
+.btn-slot-pill:active, .btn-slot-pill.active-press {
+  transform: scale(0.92);
+  background: rgba(0, 210, 211, 0.35);
+  border-color: #00d2d3;
+  box-shadow: 0 0 10px rgba(0, 210, 211, 0.5);
+}
+
+.btn-slot-pill.occupied {
+  border-color: var(--color-gold);
+  background: rgba(254, 202, 87, 0.2);
+  color: #ffeaa7;
+}
+
+.btn-slot-pill.slot-ready {
+  border-color: #00d2d3 !important;
+  background: rgba(0, 210, 211, 0.3) !important;
+  animation: slotPulse 1.2s infinite alternate;
+}
+
 .seesaw-controls-strip {
   display: flex;
   align-items: center;

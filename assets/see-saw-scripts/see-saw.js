@@ -45,6 +45,7 @@
   let draggedItemData = null; // { weight, fromSlotId?: string, originEl?: HTMLElement }
   let dragGhost = null;
   let selectedWeightIndex = null;
+  let pendingWeightTouch = null;
 
   // DOM Elements
   const stage = document.getElementById('stage');
@@ -211,7 +212,7 @@
       `;
 
       if (isUnlocked) {
-        card.addEventListener('click', () => {
+        addTapListener(card, () => {
           isEndlessMode = false;
           startLevel(level);
         });
@@ -237,7 +238,7 @@
           <button class="btn-secondary" style="padding: 6px 12px; font-size: 11px;">ENTER</button>
         </div>
       `;
-      endlessCard.addEventListener('click', () => {
+      addTapListener(endlessCard, () => {
         isEndlessMode = true;
         endlessIndex = 13;
         startLevel(Core.generateProceduralLevel(endlessIndex));
@@ -260,6 +261,57 @@
     showScreen('game');
   }
 
+  function handleSlotClick(slotId) {
+    if (!gameState || gameState.isBalanced) return;
+    const currentWeight = gameState.slots[slotId];
+    if (currentWeight) {
+      if (!currentWeight.locked) {
+        const removed = Core.removeWeightFromSlot(gameState, slotId);
+        if (removed) {
+          gameState.rack.push(removed);
+          audio.playSfx('drop');
+          selectedWeightIndex = null;
+          renderRack();
+          updateBeamVisuals();
+        }
+      }
+    } else {
+      let weightToPlace = null;
+      if (selectedWeightIndex !== null && gameState.rack[selectedWeightIndex]) {
+        weightToPlace = gameState.rack.splice(selectedWeightIndex, 1)[0];
+        selectedWeightIndex = null;
+      } else if (gameState.rack.length > 0) {
+        weightToPlace = gameState.rack.shift();
+      }
+
+      if (weightToPlace) {
+        Core.placeWeightInSlot(gameState, weightToPlace, slotId);
+        audio.playSfx('drop');
+        renderRack();
+        updateBeamVisuals();
+      }
+    }
+  }
+
+  function updateQuickSlotButtons() {
+    Core.CONSTANTS.SLOTS.forEach(slotDef => {
+      const btn = document.getElementById(`btn-slot-${slotDef.id}`);
+      if (!btn) return;
+      const weight = gameState ? gameState.slots[slotDef.id] : null;
+      btn.classList.remove('occupied', 'slot-ready');
+
+      if (weight) {
+        btn.classList.add('occupied');
+        btn.innerHTML = `${slotDef.id} <span class="slot-factor">${weight.mass}g</span>`;
+      } else {
+        btn.innerHTML = `${slotDef.id} <span class="slot-factor">${slotDef.distance}x</span>`;
+        if (selectedWeightIndex !== null && gameState && gameState.rack[selectedWeightIndex]) {
+          btn.classList.add('slot-ready');
+        }
+      }
+    });
+  }
+
   function updateBeamVisuals() {
     if (!gameState) return;
 
@@ -274,6 +326,9 @@
     hudTorqueStatus.className = `hud-torque-status ${isBal ? 'balanced' : ''}`;
     hudMovesPill.textContent = `MOVES: ${gameState.movesUsed}/${gameState.parMoves}`;
 
+    // Update Quick Slot Bar
+    updateQuickSlotButtons();
+
     // Render Slots contents
     Core.CONSTANTS.SLOTS.forEach(slotDef => {
       const slotEl = document.getElementById(`slot-${slotDef.id}`);
@@ -281,7 +336,7 @@
 
       const weight = gameState.slots[slotDef.id];
       slotEl.innerHTML = `<span class="slot-tag">${slotDef.label}</span>`;
-      slotEl.classList.remove('occupied');
+      slotEl.classList.remove('occupied', 'slot-ready');
 
       if (weight) {
         slotEl.classList.add('occupied');
@@ -291,25 +346,38 @@
         img.className = 'placed-weight-img';
         slotEl.appendChild(img);
 
-        // If not locked, allow dragging off the beam
+        // If not locked, allow tap to return to rack OR drag off the beam
         if (!weight.locked) {
-          slotEl.style.cursor = 'grab';
-          slotEl.onpointerdown = (e) => startWeightDrag(e, weight, slotDef.id, slotEl);
+          slotEl.style.cursor = 'pointer';
+          slotEl.onpointerdown = (e) => {
+            if (gameState.isBalanced) return;
+            pendingWeightTouch = {
+              startX: e.clientX,
+              startY: e.clientY,
+              weight: weight,
+              idx: null,
+              pointerId: e.pointerId,
+              originEl: slotEl,
+              fromSlotId: slotDef.id,
+              isTouch: e.pointerType === 'touch'
+            };
+          };
         } else {
           slotEl.style.cursor = 'default';
           slotEl.onpointerdown = null;
         }
       } else {
+        // Slot is empty: if a weight is selected, pulse as a ready drop target
+        if (selectedWeightIndex !== null && gameState.rack[selectedWeightIndex]) {
+          slotEl.classList.add('slot-ready');
+        }
         slotEl.style.cursor = 'pointer';
+
         slotEl.onpointerdown = (e) => {
-          if (selectedWeightIndex !== null && gameState.rack[selectedWeightIndex]) {
-            const w = gameState.rack.splice(selectedWeightIndex, 1)[0];
-            selectedWeightIndex = null;
-            Core.placeWeightInSlot(gameState, w, slotDef.id);
-            audio.playSfx('drop');
-            renderRack();
-            updateBeamVisuals();
-          }
+          if (gameState.isBalanced) return;
+          if (e.cancelable) e.preventDefault();
+          e.stopPropagation();
+          handleSlotClick(slotDef.id);
         };
       }
     });
@@ -333,36 +401,25 @@
         <span class="weight-label">${weight.label}</span>
       `;
 
-      item.addEventListener('pointerdown', (e) => startWeightDrag(e, weight, null, item));
-      item.addEventListener('click', (e) => {
-        selectedWeightIndex = (selectedWeightIndex === idx) ? null : idx;
-        renderRack();
+      item.addEventListener('pointerdown', (e) => {
+        if (gameState.isBalanced) return;
+        pendingWeightTouch = {
+          startX: e.clientX,
+          startY: e.clientY,
+          weight: weight,
+          idx: idx,
+          pointerId: e.pointerId,
+          originEl: item,
+          fromSlotId: null,
+          isTouch: e.pointerType === 'touch'
+        };
       });
+
       rackList.appendChild(item);
     });
   }
 
-  // --- 5. TOUCH & DRAG-AND-DROP (Strict Section 5 Compliance) ---
-  function startWeightDrag(e, weight, fromSlotId, originEl) {
-    if (isDragging || gameState.isBalanced) return;
-    e.preventDefault();
-
-    isDragging = true;
-    activePointerId = e.pointerId;
-    draggedItemData = { weight, fromSlotId, originEl };
-
-    const isTouch = e.pointerType === 'touch';
-    const touchLift = isTouch ? -14 : 0;
-
-    // Create fixed position drag ghost
-    dragGhost = document.createElement('div');
-    dragGhost.className = 'drag-ghost';
-    dragGhost.innerHTML = `<img src="../see-saw-assets/page-4/${weight.sprite}" style="width: 44px; height: 44px; object-fit: contain;">`;
-    document.body.appendChild(dragGhost);
-
-    updateGhostPosition(e.clientX, e.clientY + touchLift);
-  }
-
+  // --- 5. TOUCH & DRAG-AND-DROP WITH 65px MAGNETIC SNAP & INSTANT TAP ---
   function updateGhostPosition(clientX, clientY) {
     if (!dragGhost) return;
     dragGhost.style.left = `${clientX}px`;
@@ -370,29 +427,53 @@
   }
 
   function resolveDropSlot(clientX, clientY) {
-    // Non-overlapping hit testing against all slots
     const slots = document.querySelectorAll('.beam-slot');
-    let matchedSlot = null;
+    let closestSlot = null;
+    let minDistance = Infinity;
 
     slots.forEach(slot => {
       const rect = slot.getBoundingClientRect();
-      // Expand hit area slightly
-      if (
-        clientX >= rect.left - 10 &&
-        clientX <= rect.right + 10 &&
-        clientY >= rect.top - 10 &&
-        clientY <= rect.bottom + 10
-      ) {
-        matchedSlot = slot;
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top + rect.height / 2;
+      const dist = Math.hypot(clientX - cx, clientY - cy);
+      if (dist < minDistance) {
+        minDistance = dist;
+        closestSlot = slot;
       }
     });
 
-    return matchedSlot;
+    // 65px radius magnetic drop snap for mobile touch accuracy
+    if (minDistance < 65) {
+      return closestSlot;
+    }
+    return null;
   }
 
   window.addEventListener('pointermove', (e) => {
+    // Check if pending touch should promote to active drag (16px threshold for forgiving mobile touch)
+    if (pendingWeightTouch && !isDragging && e.pointerId === pendingWeightTouch.pointerId) {
+      const dist = Math.hypot(e.clientX - pendingWeightTouch.startX, e.clientY - pendingWeightTouch.startY);
+      if (dist > 16) {
+        isDragging = true;
+        activePointerId = pendingWeightTouch.pointerId;
+        draggedItemData = {
+          weight: pendingWeightTouch.weight,
+          idx: pendingWeightTouch.idx,
+          fromSlotId: pendingWeightTouch.fromSlotId,
+          originEl: pendingWeightTouch.originEl
+        };
+
+        const touchLift = pendingWeightTouch.isTouch ? -14 : 0;
+        dragGhost = document.createElement('div');
+        dragGhost.className = 'drag-ghost';
+        dragGhost.innerHTML = `<img src="../see-saw-assets/page-4/${draggedItemData.weight.sprite}" style="width: 44px; height: 44px; object-fit: contain;">`;
+        document.body.appendChild(dragGhost);
+        updateGhostPosition(e.clientX, e.clientY + touchLift);
+      }
+    }
+
     if (!isDragging || e.pointerId !== activePointerId) return;
-    e.preventDefault();
+    if (e.cancelable) e.preventDefault();
 
     const isTouch = e.pointerType === 'touch';
     const touchLift = isTouch ? -14 : 0;
@@ -410,56 +491,87 @@
   });
 
   window.addEventListener('pointerup', (e) => {
-    if (!isDragging || e.pointerId !== activePointerId) return;
-    e.preventDefault();
+    if (isDragging && e.pointerId === activePointerId) {
+      if (e.cancelable) e.preventDefault();
+      const isTouch = e.pointerType === 'touch';
+      const touchLift = isTouch ? -14 : 0;
+      const dropX = e.clientX;
+      const dropY = e.clientY + touchLift;
 
-    const isTouch = e.pointerType === 'touch';
-    const touchLift = isTouch ? -14 : 0;
-    const dropX = e.clientX;
-    const dropY = e.clientY + touchLift;
+      const targetSlot = resolveDropSlot(dropX, dropY);
+      document.querySelectorAll('.beam-slot').forEach(s => s.classList.remove('hover-target'));
 
-    // Resolve drop target BEFORE removing drag ghost (Rule 5.5)
-    const targetSlot = resolveDropSlot(dropX, dropY);
-    document.querySelectorAll('.beam-slot').forEach(s => s.classList.remove('hover-target'));
-
-    if (targetSlot) {
-      const slotId = targetSlot.getAttribute('data-slot');
-      if (gameState.slots[slotId] === null) {
-        // Success: drop into slot
-        if (draggedItemData.fromSlotId) {
-          Core.removeWeightFromSlot(gameState, draggedItemData.fromSlotId);
-        } else {
-          // Remove from rack
-          const idx = gameState.rack.findIndex(w => w.id === draggedItemData.weight.id);
-          if (idx !== -1) gameState.rack.splice(idx, 1);
+      if (targetSlot) {
+        const slotId = targetSlot.getAttribute('data-slot');
+        if (gameState.slots[slotId] === null) {
+          if (draggedItemData.fromSlotId) {
+            Core.removeWeightFromSlot(gameState, draggedItemData.fromSlotId);
+          } else {
+            const idx = gameState.rack.findIndex(w => w.id === draggedItemData.weight.id);
+            if (idx !== -1) gameState.rack.splice(idx, 1);
+          }
+          selectedWeightIndex = null;
+          Core.placeWeightInSlot(gameState, draggedItemData.weight, slotId);
+          audio.playSfx('drop');
+          renderRack();
+          updateBeamVisuals();
         }
-
-        Core.placeWeightInSlot(gameState, draggedItemData.weight, slotId);
-        audio.playSfx('drop');
-        renderRack();
-        updateBeamVisuals();
+      } else {
+        if (draggedItemData.fromSlotId) {
+          const removed = Core.removeWeightFromSlot(gameState, draggedItemData.fromSlotId);
+          if (removed) {
+            gameState.rack.push(removed);
+            audio.playSfx('drop');
+            renderRack();
+            updateBeamVisuals();
+          }
+        } else {
+          // If released near origin without hitting a slot, treat as tap to toggle selection
+          const dist = Math.hypot(e.clientX - (pendingWeightTouch ? pendingWeightTouch.startX : 0), e.clientY - (pendingWeightTouch ? pendingWeightTouch.startY : 0));
+          if (dist < 40 && draggedItemData && draggedItemData.idx !== null) {
+            selectedWeightIndex = (selectedWeightIndex === draggedItemData.idx) ? null : draggedItemData.idx;
+            audio.playSfx('drop');
+            renderRack();
+            updateBeamVisuals();
+          }
+        }
       }
-    } else {
-      // Dropped outside: If it came from a slot, return it to the rack
-      if (draggedItemData.fromSlotId) {
-        const removed = Core.removeWeightFromSlot(gameState, draggedItemData.fromSlotId);
-        if (removed) {
-          gameState.rack.push(removed);
+
+      if (dragGhost && dragGhost.parentNode) {
+        dragGhost.parentNode.removeChild(dragGhost);
+      }
+      dragGhost = null;
+      isDragging = false;
+      activePointerId = null;
+      draggedItemData = null;
+      pendingWeightTouch = null;
+      return;
+    }
+
+    // Tap Gesture Resolution
+    if (pendingWeightTouch && e.pointerId === pendingWeightTouch.pointerId) {
+      const dist = Math.hypot(e.clientX - pendingWeightTouch.startX, e.clientY - pendingWeightTouch.startY);
+      if (dist <= 24) {
+        if (pendingWeightTouch.fromSlotId) {
+          // Tap on placed beam weight -> return to rack
+          const removed = Core.removeWeightFromSlot(gameState, pendingWeightTouch.fromSlotId);
+          if (removed) {
+            gameState.rack.push(removed);
+            audio.playSfx('drop');
+            selectedWeightIndex = null;
+            renderRack();
+            updateBeamVisuals();
+          }
+        } else {
+          // Tap on rack weight -> toggle selection
+          selectedWeightIndex = (selectedWeightIndex === pendingWeightTouch.idx) ? null : pendingWeightTouch.idx;
           audio.playSfx('drop');
           renderRack();
           updateBeamVisuals();
         }
       }
+      pendingWeightTouch = null;
     }
-
-    // Cleanup ghost
-    if (dragGhost && dragGhost.parentNode) {
-      dragGhost.parentNode.removeChild(dragGhost);
-    }
-    dragGhost = null;
-    isDragging = false;
-    activePointerId = null;
-    draggedItemData = null;
   });
 
   window.addEventListener('pointercancel', (e) => {
@@ -473,6 +585,7 @@
       draggedItemData = null;
       updateBeamVisuals();
     }
+    pendingWeightTouch = null;
   });
 
   window.addEventListener('touchmove', (e) => {
@@ -566,54 +679,98 @@
     }
   }
 
+  function flashButton(btnId) {
+    const el = document.getElementById(btnId);
+    if (el) {
+      el.classList.add('active-press');
+      setTimeout(() => el.classList.remove('active-press'), 140);
+    }
+  }
+
+  function addTapListener(el, callback) {
+    if (!el) return;
+    let isDown = false;
+    let startX = 0;
+    let startY = 0;
+    let lastTime = 0;
+
+    function fire(e) {
+      const now = Date.now();
+      if (now - lastTime < 180) return;
+      lastTime = now;
+      if (e.cancelable) e.preventDefault();
+      e.stopPropagation();
+      callback(e);
+    }
+
+    el.addEventListener('pointerdown', (e) => {
+      isDown = true;
+      startX = e.clientX;
+      startY = e.clientY;
+      el.classList.add('active-press');
+    }, { passive: true });
+
+    el.addEventListener('pointerup', (e) => {
+      if (!isDown) return;
+      isDown = false;
+      el.classList.remove('active-press');
+      const dist = Math.hypot(e.clientX - startX, e.clientY - startY);
+      if (dist < 28) {
+        fire(e);
+      }
+    });
+
+    el.addEventListener('pointercancel', () => {
+      isDown = false;
+      el.classList.remove('active-press');
+    });
+
+    el.addEventListener('click', (e) => {
+      fire(e);
+    });
+  }
+
   function setupEventListeners() {
-    const btnLandingExit = document.getElementById('btn-landing-exit');
-    if (btnLandingExit) btnLandingExit.addEventListener('click', exitGame);
+    addTapListener(document.getElementById('btn-landing-exit'), exitGame);
+    addTapListener(document.getElementById('btn-quick-play'), () => startLevel(Core.LEVELS[0]));
+    addTapListener(document.getElementById('btn-start'), () => showScreen('tutorial'));
 
-    const btnQuick = document.getElementById('btn-quick-play');
-    if (btnQuick) {
-      btnQuick.addEventListener('click', () => {
-        startLevel(Core.LEVELS[0]);
-      });
-    }
+    addTapListener(document.getElementById('btn-tutorial-back'), () => showScreen('landing'));
+    addTapListener(document.getElementById('btn-tutorial-continue'), () => showScreen('map'));
 
-    const btnStart = document.getElementById('btn-start');
-    if (btnStart) {
-      btnStart.addEventListener('click', () => {
-        showScreen('tutorial');
-      });
-    }
+    addTapListener(document.getElementById('btn-map-exit'), exitGame);
+    addTapListener(document.getElementById('btn-game-map'), () => showScreen('map'));
+    addTapListener(document.getElementById('btn-game-exit'), exitGame);
+    addTapListener(document.getElementById('btn-game-retry'), () => startLevel(activeLevel));
 
-    document.getElementById('btn-tutorial-back').addEventListener('click', () => {
-      showScreen('landing');
-    });
-    document.getElementById('btn-tutorial-continue').addEventListener('click', () => {
-      showScreen('map');
+    // Calibration Rack Action Buttons
+    addTapListener(document.getElementById('btn-auto-balance'), () => {
+      flashButton('btn-auto-balance');
+      autoBalanceHelper();
     });
 
-    document.getElementById('btn-map-exit').addEventListener('click', exitGame);
-
-    document.getElementById('btn-game-map').addEventListener('click', () => {
-      showScreen('map');
+    addTapListener(document.getElementById('btn-undo-move'), () => {
+      flashButton('btn-undo-move');
+      undoLastMove();
     });
-    const btnGameExit = document.getElementById('btn-game-exit');
-    if (btnGameExit) btnGameExit.addEventListener('click', exitGame);
 
-    document.getElementById('btn-game-retry').addEventListener('click', () => {
+    addTapListener(document.getElementById('btn-reset-rack'), () => {
+      flashButton('btn-reset-rack');
       startLevel(activeLevel);
     });
 
-    // Calibration Rack Action Buttons
-    const btnAuto = document.getElementById('btn-auto-balance');
-    if (btnAuto) btnAuto.addEventListener('click', autoBalanceHelper);
+    // 6 Quick Beam Slot Buttons
+    Core.CONSTANTS.SLOTS.forEach(slotDef => {
+      const btn = document.getElementById(`btn-slot-${slotDef.id}`);
+      if (btn) {
+        addTapListener(btn, () => {
+          flashButton(`btn-slot-${slotDef.id}`);
+          handleSlotClick(slotDef.id);
+        });
+      }
+    });
 
-    const btnUndo = document.getElementById('btn-undo-move');
-    if (btnUndo) btnUndo.addEventListener('click', undoLastMove);
-
-    const btnResetRack = document.getElementById('btn-reset-rack');
-    if (btnResetRack) btnResetRack.addEventListener('click', () => startLevel(activeLevel));
-
-    document.getElementById('btn-next-level').addEventListener('click', () => {
+    addTapListener(document.getElementById('btn-next-level'), () => {
       if (isEndlessMode) {
         endlessIndex++;
         startLevel(Core.generateProceduralLevel(endlessIndex));
@@ -626,16 +783,13 @@
         }
       }
     });
-    document.getElementById('btn-replay-level').addEventListener('click', () => {
-      startLevel(activeLevel);
-    });
-    document.getElementById('btn-victory-map').addEventListener('click', () => {
-      showScreen('map');
-    });
+
+    addTapListener(document.getElementById('btn-replay-level'), () => startLevel(activeLevel));
+    addTapListener(document.getElementById('btn-victory-map'), () => showScreen('map'));
 
     // Mute Toggles
     document.querySelectorAll('.btn-mute').forEach(btn => {
-      btn.addEventListener('click', () => {
+      addTapListener(btn, () => {
         const muted = audio.toggleMute();
         saveData.soundMuted = muted;
         Core.saveGameData(window.localStorage, saveData);
@@ -654,10 +808,10 @@
     const btnRules = document.getElementById('btn-see-saw-rules');
     const btnCloseRules = document.getElementById('btn-close-rules');
     if (btnRules && modalRules) {
-      btnRules.addEventListener('click', () => modalRules.classList.add('active'));
+      addTapListener(btnRules, () => modalRules.classList.add('active'));
     }
     if (btnCloseRules && modalRules) {
-      btnCloseRules.addEventListener('click', () => modalRules.classList.remove('active'));
+      addTapListener(btnCloseRules, () => modalRules.classList.remove('active'));
     }
 
     // Keyboard Controls (Desktop Accessibility)
@@ -746,13 +900,8 @@
 
         if (slotKeys[e.key] && !gameState.isBalanced) {
           const targetSlotId = slotKeys[e.key];
-          if (gameState.slots[targetSlotId] === null && gameState.rack.length > 0) {
-            const weight = gameState.rack.shift();
-            Core.placeWeightInSlot(gameState, weight, targetSlotId);
-            audio.playSfx('drop');
-            renderRack();
-            updateBeamVisuals();
-          }
+          flashButton(`btn-slot-${targetSlotId}`);
+          handleSlotClick(targetSlotId);
           return;
         }
 
