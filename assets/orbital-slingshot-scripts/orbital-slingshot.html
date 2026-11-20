@@ -48,9 +48,23 @@
         <div class="preloader-status" id="preloader-status">Orbital telemetry nominal. Ready for launch.</div>
       </div>
 
-      <div class="start-btn-wrap" id="start-btn-wrap">
-        <button class="btn-primary" id="btn-quick-play" aria-label="Quick Launch Level 1">🚀 Launch Game</button>
-        <button class="btn-secondary" id="btn-start" aria-label="Mission Campaign">🌌 Mission Briefing</button>
+      <div class="start-btn-wrap launch-keys-dock" id="start-btn-wrap">
+        <button class="btn-primary btn-launch-key-giant" id="btn-quick-play" aria-label="Quick Launch Level 1">
+          <span class="key-badge"><kbd>SPACE</kbd> or <kbd>TAP</kbd> TO LAUNCH</span>
+          <span class="key-label-text">🚀 LAUNCH GAME NOW</span>
+        </button>
+
+        <div class="launch-key-legend-row">
+          <button class="btn-secondary btn-launch-key-sub" id="btn-start" aria-label="Mission Campaign">
+            <kbd>ENTER</kbd> 🌌 Mission Briefing
+          </button>
+          <button class="btn-secondary btn-launch-key-sub btn-mute" aria-label="Toggle Sound">
+            <kbd>M</kbd> 🔊 Sound
+          </button>
+        </div>
+        <div class="launch-touch-callout">
+          <span>🎮 ON-SCREEN KEYS ACTIVE &bull; TAP <kbd>🚀 LAUNCH</kbd> OR ANYWHERE TO PLAY</span>
+        </div>
       </div>
     </section>
 
@@ -171,7 +185,7 @@
         </div>
       </header>
 
-      <!-- Bottom Interactive Tactical Flight Deck -->
+      <!-- Bottom Interactive Tactical Flight Deck with Permanent On-Screen Keys -->
       <footer class="game-controls-bar flight-deck" id="game-controls-bar">
         <!-- Telemetry readout strip -->
         <div class="telemetry-bar">
@@ -180,36 +194,51 @@
           <span class="telemetry-item telemetry-mode" id="telemetry-status">STATUS: READY</span>
         </div>
 
-        <!-- Primary control buttons row -->
+        <!-- On-Screen Steering & Thrust Keys Row -->
         <div class="deck-main-row">
-          <button class="btn-steer" id="btn-steer-left" aria-label="Curve Left (A or Left Arrow)">
-            <span class="btn-arrow">◀</span>
-            <span class="btn-label">LEFT <kbd>A</kbd></span>
+          <button class="btn-steer onscreen-key" id="btn-steer-left" aria-label="Steer Left">
+            <kbd class="keycap">◀ A</kbd>
+            <span class="btn-label">LEFT</span>
           </button>
-          <button class="btn-launch-fire" id="btn-launch-fire" aria-label="Launch Probe (Space or Enter)">
-            <span class="fire-icon">🚀</span>
-            <span class="fire-text">FIRE PROBE</span>
-            <span class="fire-kbd"><kbd>SPACE</kbd></span>
+          <button class="btn-steer onscreen-key" id="btn-power-up" aria-label="Increase Power">
+            <kbd class="keycap">▲ W</kbd>
+            <span class="btn-label">+POWER</span>
           </button>
-          <button class="btn-steer" id="btn-steer-right" aria-label="Curve Right (D or Right Arrow)">
-            <span class="btn-label">RIGHT <kbd>D</kbd></span>
-            <span class="btn-arrow">▶</span>
+          <button class="btn-steer onscreen-key" id="btn-power-down" aria-label="Decrease Power">
+            <kbd class="keycap">▼ S</kbd>
+            <span class="btn-label">-POWER</span>
+          </button>
+          <button class="btn-steer onscreen-key" id="btn-steer-right" aria-label="Steer Right">
+            <kbd class="keycap">D ▶</kbd>
+            <span class="btn-label">RIGHT</span>
+          </button>
+          <button class="btn-steer onscreen-key" id="btn-recenter-aim" aria-label="Center Aim">
+            <kbd class="keycap">↺ C</kbd>
+            <span class="btn-label">AIM</span>
           </button>
         </div>
 
-        <!-- Secondary auxiliary control row -->
+        <!-- Giant On-Screen Fire Launch Key -->
+        <div class="deck-fire-row">
+          <button class="btn-launch-fire onscreen-fire-key" id="btn-launch-fire" aria-label="Launch Probe">
+            <span class="fire-kbd-pill"><kbd>SPACE</kbd> or <kbd>TAP KEY</kbd></span>
+            <span class="fire-text">🚀 FIRE PROBE NOW</span>
+          </button>
+        </div>
+
+        <!-- Auxiliary Action Keys Row -->
         <div class="deck-aux-row">
-          <button class="btn-deck-pill" id="btn-power-down" aria-label="Decrease Power (S or Down Arrow)">
-            <span>▼ -Power</span> <kbd>S</kbd>
+          <button class="btn-deck-pill onscreen-aux-key" id="btn-game-retry-deck" aria-label="Retry Level">
+            <kbd class="keycap-sm">R</kbd> <span>↺ Retry</span>
           </button>
-          <button class="btn-deck-pill" id="btn-recenter-aim" aria-label="Recenter Trajectory">
-            <span>↺ Center</span>
+          <button class="btn-deck-pill btn-info-toggle onscreen-aux-key" id="btn-info-toggle" aria-label="Mission Rules">
+            <kbd class="keycap-sm">I</kbd> <span>ℹ️ Rules</span>
           </button>
-          <button class="btn-deck-pill" id="btn-power-up" aria-label="Increase Power (W or Up Arrow)">
-            <span>▲ +Power</span> <kbd>W</kbd>
+          <button class="btn-deck-pill onscreen-aux-key" id="btn-game-map-deck" aria-label="Sector Map">
+            <kbd class="keycap-sm">MAP</kbd> <span>🗺️ Sectors</span>
           </button>
-          <button class="btn-deck-pill btn-info-toggle" id="btn-info-toggle" aria-label="Toggle Mission Rules">
-            <span>ℹ️ Rules</span> <kbd>I</kbd>
+          <button class="btn-deck-pill onscreen-aux-key" id="btn-game-exit-deck" aria-label="Exit Game">
+            <kbd class="keycap-sm">ESC</kbd> <span>✕ Exit</span>
           </button>
         </div>
       </footer>

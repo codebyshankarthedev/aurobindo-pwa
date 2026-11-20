@@ -330,6 +330,104 @@ img {
   align-items: center;
 }
 
+/* --- High-Visibility On-Screen Launch Keys Dock --- */
+.launch-keys-dock {
+  width: 100%;
+  max-width: 92%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: calc(1.5 * var(--u));
+}
+
+.btn-launch-key-giant {
+  width: 100% !important;
+  padding: calc(2 * var(--u)) calc(3 * var(--u)) !important;
+  border-radius: calc(2.4 * var(--u)) !important;
+  background: linear-gradient(135deg, #00d2d3 0%, #05c46b 100%) !important;
+  border: 2px solid #ffffff !important;
+  box-shadow: 0 0 calc(3 * var(--u)) rgba(0, 210, 211, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.7) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: calc(0.6 * var(--u)) !important;
+  cursor: pointer !important;
+  touch-action: manipulation !important;
+  animation: launchKeyGlow 2s ease-in-out infinite alternate !important;
+}
+
+@keyframes launchKeyGlow {
+  0% { transform: scale(1); box-shadow: 0 0 calc(2 * var(--u)) rgba(0, 210, 211, 0.4); }
+  100% { transform: scale(1.02); box-shadow: 0 0 calc(3.5 * var(--u)) rgba(0, 210, 211, 0.85); }
+}
+
+.key-badge {
+  font-size: calc(1.8 * var(--u));
+  font-weight: 800;
+  color: #ffd32a;
+  display: flex;
+  align-items: center;
+  gap: calc(0.6 * var(--u));
+  text-transform: uppercase;
+}
+
+.key-badge kbd {
+  background: rgba(0, 0, 0, 0.7);
+  border: 1px solid #ffd32a;
+  color: #ffd32a;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.key-label-text {
+  font-size: calc(3.2 * var(--u));
+  font-weight: 900;
+  letter-spacing: 0.8px;
+  color: #071020;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.4);
+}
+
+.launch-key-legend-row {
+  display: flex;
+  gap: calc(1.5 * var(--u));
+  width: 100%;
+}
+
+.btn-launch-key-sub {
+  flex: 1;
+  padding: calc(1.2 * var(--u)) calc(1.5 * var(--u)) !important;
+  font-size: calc(2 * var(--u)) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: calc(0.8 * var(--u)) !important;
+}
+
+.btn-launch-key-sub kbd {
+  background: rgba(0, 210, 211, 0.2);
+  border: 1px solid var(--color-teal);
+  color: var(--color-teal);
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-size: 0.75rem;
+}
+
+.launch-touch-callout {
+  font-size: calc(1.8 * var(--u));
+  color: var(--color-teal);
+  font-family: monospace;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-align: center;
+  margin-top: calc(0.5 * var(--u));
+}
+
+.launch-touch-callout kbd {
+  font-size: 0.7rem;
+  padding: 1px 4px;
+}
+
 /* ==========================================================================
    PAGE 2: TUTORIAL BRIEFING
    ========================================================================== */
@@ -952,13 +1050,19 @@ img {
 /* ==========================================================================
    QUICK SLOTS STRIP & ACTIONS STRIP FOR MOBILE ERGONOMICS
    ========================================================================== */
-.quick-slots-strip {
+.quick-slots-strip, .onscreen-slot-keys-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: calc(1 * var(--u));
   margin-top: calc(0.8 * var(--u));
   padding-top: calc(0.6 * var(--u));
+}
+
+.onscreen-key {
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .btn-slot-pill {
@@ -974,11 +1078,30 @@ img {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: calc(0.3 * var(--u));
   cursor: pointer;
   touch-action: manipulation;
   user-select: none;
   -webkit-user-select: none;
   transition: transform 0.1s ease, background 0.1s ease, border-color 0.1s ease, box-shadow 0.1s ease;
+}
+
+.btn-slot-pill .keycap {
+  font-size: calc(1.6 * var(--u));
+  font-family: monospace;
+  font-weight: 800;
+  background: rgba(0, 0, 0, 0.85);
+  border: 1px solid var(--color-teal);
+  color: var(--color-teal);
+  padding: 1px 4px;
+  border-radius: 3px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+}
+
+.btn-slot-pill .slot-name {
+  font-size: calc(1.8 * var(--u));
+  font-weight: 800;
+  color: #ffffff;
 }
 
 .btn-slot-pill .slot-factor {
@@ -1006,15 +1129,50 @@ img {
   animation: slotPulse 1.2s infinite alternate;
 }
 
-.seesaw-controls-strip {
+.seesaw-controls-strip, .onscreen-action-keys {
   display: flex;
-  align-items: center;
+  align-items: stretch;
   justify-content: space-between;
-  flex-wrap: wrap;
-  gap: calc(1 * var(--u));
+  gap: calc(0.8 * var(--u));
   margin-top: calc(1 * var(--u));
   padding-top: calc(0.8 * var(--u));
   border-top: 1px solid rgba(0, 210, 211, 0.25);
+}
+
+.onscreen-action-keys .keycap {
+  font-size: calc(1.5 * var(--u));
+  font-family: monospace;
+  font-weight: 800;
+  background: rgba(0, 0, 0, 0.85);
+  border: 1px solid var(--color-teal);
+  color: var(--color-teal);
+  padding: 1px 4px;
+  border-radius: 3px;
+}
+
+.key-balance-giant {
+  flex: 1.6 !important;
+  background: linear-gradient(135deg, #00d2d3 0%, #05c46b 100%) !important;
+  color: #071020 !important;
+  border: 1.5px solid #ffffff !important;
+  font-weight: 900 !important;
+  box-shadow: 0 0 calc(2 * var(--u)) var(--color-teal-glow), inset 0 1px 0 rgba(255, 255, 255, 0.6) !important;
+  animation: balanceKeyPulse 2s ease-in-out infinite alternate;
+}
+
+@keyframes balanceKeyPulse {
+  0% { transform: scale(1); box-shadow: 0 0 calc(1.5 * var(--u)) rgba(0, 210, 211, 0.4); }
+  100% { transform: scale(1.02); box-shadow: 0 0 calc(2.8 * var(--u)) rgba(0, 210, 211, 0.85); }
+}
+
+.key-balance-giant .keycap {
+  background: #071020 !important;
+  color: #ffd32a !important;
+  border-color: #ffd32a !important;
+}
+
+.key-balance-giant:active, .key-balance-giant.active-press {
+  transform: scale(0.94) !important;
 }
 
 .control-badge {

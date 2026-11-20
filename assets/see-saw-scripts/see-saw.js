@@ -294,17 +294,19 @@
   }
 
   function updateQuickSlotButtons() {
+    const slotNumMap = { 'L-3': '1', 'L-2': '2', 'L-1': '3', 'R-1': '4', 'R-2': '5', 'R-3': '6' };
     Core.CONSTANTS.SLOTS.forEach(slotDef => {
       const btn = document.getElementById(`btn-slot-${slotDef.id}`);
       if (!btn) return;
+      const numKey = slotNumMap[slotDef.id] || '•';
       const weight = gameState ? gameState.slots[slotDef.id] : null;
       btn.classList.remove('occupied', 'slot-ready');
 
       if (weight) {
         btn.classList.add('occupied');
-        btn.innerHTML = `${slotDef.id} <span class="slot-factor">${weight.mass}g</span>`;
+        btn.innerHTML = `<kbd class="keycap">${numKey}</kbd><span class="slot-name">${slotDef.id}</span><span class="slot-factor">${weight.mass}g</span>`;
       } else {
-        btn.innerHTML = `${slotDef.id} <span class="slot-factor">${slotDef.distance}x</span>`;
+        btn.innerHTML = `<kbd class="keycap">${numKey}</kbd><span class="slot-name">${slotDef.id}</span><span class="slot-factor">${slotDef.distance}x</span>`;
         if (selectedWeightIndex !== null && gameState && gameState.rack[selectedWeightIndex]) {
           btn.classList.add('slot-ready');
         }
@@ -734,6 +736,17 @@
     addTapListener(document.getElementById('btn-landing-exit'), exitGame);
     addTapListener(document.getElementById('btn-quick-play'), () => startLevel(Core.LEVELS[0]));
     addTapListener(document.getElementById('btn-start'), () => showScreen('tutorial'));
+
+    // Any tap on landing screen immediately starts Station 1!
+    const landingSection = document.getElementById('screen-landing');
+    if (landingSection) {
+      addTapListener(landingSection, (e) => {
+        if (e.target.closest('#btn-landing-exit') || e.target.closest('.btn-mute') || e.target.closest('#btn-start')) {
+          return;
+        }
+        startLevel(Core.LEVELS[0]);
+      });
+    }
 
     addTapListener(document.getElementById('btn-tutorial-back'), () => showScreen('landing'));
     addTapListener(document.getElementById('btn-tutorial-continue'), () => showScreen('map'));

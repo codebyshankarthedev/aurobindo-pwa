@@ -1025,6 +1025,17 @@
     addTapListener(document.getElementById('btn-quick-play'), () => startLevel(Core.LEVELS[0]));
     addTapListener(document.getElementById('btn-start'), () => showScreen('tutorial'));
 
+    // Any tap on landing screen immediately starts Level 1!
+    const landingSection = document.getElementById('screen-landing');
+    if (landingSection) {
+      addTapListener(landingSection, (e) => {
+        if (e.target.closest('#btn-landing-exit') || e.target.closest('.btn-mute') || e.target.closest('#btn-start')) {
+          return;
+        }
+        startLevel(Core.LEVELS[0]);
+      });
+    }
+
     // Page 2: Tutorial
     addTapListener(document.getElementById('btn-tutorial-back'), () => showScreen('landing'));
     addTapListener(document.getElementById('btn-tutorial-continue'), () => showScreen('map'));
@@ -1044,6 +1055,20 @@
     addTapListener(document.getElementById('btn-game-map'), () => showScreen('map'));
     addTapListener(document.getElementById('btn-game-exit'), exitGame);
     addTapListener(document.getElementById('btn-game-retry'), () => startLevel(activeLevel));
+
+    // Flight Deck Auxiliary Key Buttons
+    addTapListener(document.getElementById('btn-game-retry-deck'), () => {
+      flashButton('btn-game-retry-deck');
+      startLevel(activeLevel);
+    });
+    addTapListener(document.getElementById('btn-game-map-deck'), () => {
+      flashButton('btn-game-map-deck');
+      showScreen('map');
+    });
+    addTapListener(document.getElementById('btn-game-exit-deck'), () => {
+      flashButton('btn-game-exit-deck');
+      exitGame();
+    });
 
     // Tactile Flight Deck Buttons (Continuous Steering & Instant Fire)
     addTapListener(document.getElementById('btn-launch-fire'), () => {

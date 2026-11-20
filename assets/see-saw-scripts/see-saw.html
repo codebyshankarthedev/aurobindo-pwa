@@ -48,9 +48,23 @@
         <div class="preloader-status" id="preloader-status">Balance beam sensors calibrated. Ready for analysis.</div>
       </div>
 
-      <div class="start-btn-wrap" id="start-btn-wrap">
-        <button class="btn-primary" id="btn-quick-play" aria-label="Quick Launch Station 1">⚖️ Launch Balance Lab</button>
-        <button class="btn-secondary" id="btn-start" aria-label="Standard Operating Procedure">🔬 Lab SOP Guide</button>
+      <div class="start-btn-wrap launch-keys-dock" id="start-btn-wrap">
+        <button class="btn-primary btn-launch-key-giant" id="btn-quick-play" aria-label="Quick Launch Station 1">
+          <span class="key-badge"><kbd>SPACE</kbd> or <kbd>TAP</kbd> TO LAUNCH</span>
+          <span class="key-label-text">⚡ LAUNCH BALANCE LAB NOW</span>
+        </button>
+
+        <div class="launch-key-legend-row">
+          <button class="btn-secondary btn-launch-key-sub" id="btn-start" aria-label="Standard Operating Procedure">
+            <kbd>ENTER</kbd> 🔬 Lab SOP Guide
+          </button>
+          <button class="btn-secondary btn-launch-key-sub btn-mute" aria-label="Toggle Sound">
+            <kbd>M</kbd> 🔊 Sound
+          </button>
+        </div>
+        <div class="launch-touch-callout">
+          <span>🎮 ON-SCREEN KEYS ACTIVE &bull; TAP <kbd>⚡ LAUNCH</kbd> OR ANYWHERE TO PLAY</span>
+        </div>
       </div>
     </section>
 
@@ -183,29 +197,57 @@
           <!-- Populated dynamically -->
         </div>
 
-        <!-- Quick Beam Slot Selector Strip for 1-Thumb Mobile Play -->
-        <div class="quick-slots-strip" id="quick-slots-strip">
-          <button class="btn-slot-pill" id="btn-slot-L-3" data-slot="L-3" aria-label="Slot L3 3x">L3 <span class="slot-factor">3x</span></button>
-          <button class="btn-slot-pill" id="btn-slot-L-2" data-slot="L-2" aria-label="Slot L2 2x">L2 <span class="slot-factor">2x</span></button>
-          <button class="btn-slot-pill" id="btn-slot-L-1" data-slot="L-1" aria-label="Slot L1 1x">L1 <span class="slot-factor">1x</span></button>
-          <button class="btn-slot-pill" id="btn-slot-R-1" data-slot="R-1" aria-label="Slot R1 1x">R1 <span class="slot-factor">1x</span></button>
-          <button class="btn-slot-pill" id="btn-slot-R-2" data-slot="R-2" aria-label="Slot R2 2x">R2 <span class="slot-factor">2x</span></button>
-          <button class="btn-slot-pill" id="btn-slot-R-3" data-slot="R-3" aria-label="Slot R3 3x">R3 <span class="slot-factor">3x</span></button>
+        <!-- Quick Beam Slot Selector Strip with On-Screen Keycaps (Keys 1-6) -->
+        <div class="quick-slots-strip onscreen-slot-keys-row" id="quick-slots-strip">
+          <button class="btn-slot-pill onscreen-key" id="btn-slot-L-3" data-slot="L-3" aria-label="Slot L3 Key 1">
+            <kbd class="keycap">1</kbd>
+            <span class="slot-name">L3</span>
+            <span class="slot-factor">3x</span>
+          </button>
+          <button class="btn-slot-pill onscreen-key" id="btn-slot-L-2" data-slot="L-2" aria-label="Slot L2 Key 2">
+            <kbd class="keycap">2</kbd>
+            <span class="slot-name">L2</span>
+            <span class="slot-factor">2x</span>
+          </button>
+          <button class="btn-slot-pill onscreen-key" id="btn-slot-L-1" data-slot="L-1" aria-label="Slot L1 Key 3">
+            <kbd class="keycap">3</kbd>
+            <span class="slot-name">L1</span>
+            <span class="slot-factor">1x</span>
+          </button>
+          <button class="btn-slot-pill onscreen-key" id="btn-slot-R-1" data-slot="R-1" aria-label="Slot R1 Key 4">
+            <kbd class="keycap">4</kbd>
+            <span class="slot-name">R1</span>
+            <span class="slot-factor">1x</span>
+          </button>
+          <button class="btn-slot-pill onscreen-key" id="btn-slot-R-2" data-slot="R-2" aria-label="Slot R2 Key 5">
+            <kbd class="keycap">5</kbd>
+            <span class="slot-name">R2</span>
+            <span class="slot-factor">2x</span>
+          </button>
+          <button class="btn-slot-pill onscreen-key" id="btn-slot-R-3" data-slot="R-3" aria-label="Slot R3 Key 6">
+            <kbd class="keycap">6</kbd>
+            <span class="slot-name">R3</span>
+            <span class="slot-factor">3x</span>
+          </button>
         </div>
 
-        <!-- Interactive Tactile Action Strip -->
-        <div class="seesaw-controls-strip">
-          <button class="btn-action-pill" id="btn-auto-balance" aria-label="Auto-Balance Optimal Weight">
-            ⚡ Balance <kbd>SPACE</kbd>
+        <!-- Interactive Tactile On-Screen Action Keys -->
+        <div class="seesaw-controls-strip onscreen-action-keys">
+          <button class="btn-action-pill key-balance-giant" id="btn-auto-balance" aria-label="Auto-Balance Optimal Weight">
+            <kbd class="keycap">SPACE</kbd>
+            <span>⚡ AUTO-BALANCE</span>
           </button>
-          <button class="btn-action-pill" id="btn-undo-move" aria-label="Undo Last Weight">
-            ↶ Undo <kbd>⌫</kbd>
+          <button class="btn-action-pill onscreen-key" id="btn-undo-move" aria-label="Undo Last Weight">
+            <kbd class="keycap">⌫</kbd>
+            <span>↶ UNDO</span>
           </button>
-          <button class="btn-action-pill" id="btn-reset-rack" aria-label="Reset Weights">
-            ↺ Reset <kbd>R</kbd>
+          <button class="btn-action-pill onscreen-key" id="btn-reset-rack" aria-label="Reset Weights">
+            <kbd class="keycap">R</kbd>
+            <span>↺ RESET</span>
           </button>
-          <button class="btn-info-toggle" id="btn-see-saw-rules" aria-label="Laboratory SOP Rules">
-            ℹ️ Rules <kbd>I</kbd>
+          <button class="btn-info-toggle onscreen-key" id="btn-see-saw-rules" aria-label="Laboratory SOP Rules">
+            <kbd class="keycap">I</kbd>
+            <span>ℹ️ RULES</span>
           </button>
         </div>
       </div>
