@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Tetris — QC Core Mini-Game</title>
+  <link rel="stylesheet" href="tetris.css?v=1">
+</head>
+<body>
+  <!-- Landscape Orientation Warning Overlay -->
+  <div class="rotate-overlay" id="rotate-overlay" role="alert">
+    <div class="rotate-icon"></div>
+    <h2 class="rotate-title">Rotate Your Device</h2>
+    <p class="rotate-desc">Tetris matrix calibration requires 9:16 portrait orientation for high-precision block placement.</p>
+  </div>
+
+  <main class="stage" id="stage">
+
+    <!-- ======================================================================
+         PAGE 1: LANDING & REAL ASSET PRELOADER
+         ====================================================================== -->
+    <section class="screen active" id="screen-landing" aria-label="Landing and Preloader">
+      <img src="../tetris-assets/page-1/page-1-bg.png" alt="" class="screen-bg">
+
+      <header class="landing-header">
+        <button class="btn-icon" id="btn-landing-exit" aria-label="Exit Game">✕</button>
+        <span class="game-version-pill">QC CORE TETRIS v1.0</span>
+        <button class="btn-icon btn-mute" aria-label="Toggle Sound">🔊</button>
+      </header>
+
+      <div class="landing-hero">
+        <img src="../tetris-assets/page-1/emblem.png" alt="Tetris Emblem" class="landing-emblem">
+        <h1 class="landing-title">TETRIS</h1>
+        <p class="landing-subtitle">QC MATRIX CALIBRATION & SYNTHESIS</p>
+      </div>
+
+      <div class="preloader-card" id="preloader-card">
+        <div class="preloader-label">
+          <span>INITIALIZING MATRIX CORES</span>
+          <span class="preloader-percent" id="preloader-percent">0%</span>
+        </div>
+        <div class="preloader-bar-bg">
+          <div class="preloader-bar-fill" id="preloader-bar-fill" style="width: 0%;"></div>
+        </div>
+        <div class="preloader-status" id="preloader-status">Validating matrix telemetry...</div>
+      </div>
+
+      <div class="start-btn-wrap launch-keys-dock" id="start-btn-wrap">
+        <button class="btn-primary btn-launch-key-giant" id="btn-quick-play" aria-label="Quick Launch Level 1">
+          <span class="key-badge"><kbd>SPACE</kbd> or <kbd>TAP</kbd> TO LAUNCH</span>
+          <span class="key-label-text">🕹️ LAUNCH TETRIS NOW</span>
+        </button>
+
+        <div class="launch-key-legend-row">
+          <button class="btn-secondary btn-launch-key-sub" id="btn-start" aria-label="QC Matrix Briefing">
+            <kbd>ENTER</kbd> 📖 How To Play & SOP
+          </button>
+          <button class="btn-secondary btn-launch-key-sub btn-mute" aria-label="Toggle Sound">
+            <kbd>M</kbd> 🔊 Sound
+          </button>
+        </div>
+        <div class="launch-touch-callout">
+          <span>🎮 ON-SCREEN KEYS ACTIVE &bull; TAP <kbd>🕹️ LAUNCH</kbd> OR ANYWHERE TO PLAY</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         PAGE 2: STORY & SOP GUIDE
+         ====================================================================== -->
+    <section class="screen" id="screen-tutorial" aria-label="Story and Tutorial">
+      <img src="../tetris-assets/page-2/story-bg.png" alt="" class="screen-bg">
+
+      <header class="screen-header">
+        <button class="btn-icon" id="btn-tutorial-back" aria-label="Back">←</button>
+        <h2 class="screen-title">QC Protocol SOP</h2>
+        <button class="btn-icon btn-mute" aria-label="Toggle Sound">🔊</button>
+      </header>
+
+      <div class="tutorial-scroll-area">
+        <div class="tutorial-briefing-box">
+          <h3>QC Mission Directives</h3>
+          <p>Synthesize polymer tetromino chains into solid horizontal matrices. Clear full lines to prevent buffer overflow and advance through 12 QC sectors.</p>
+        </div>
+
+        <div class="tutorial-cards-grid">
+          <div class="tutorial-card">
+            <img src="../tetris-assets/page-2/rotate-guide.png" alt="Rotation" class="tutorial-icon">
+            <div class="tutorial-text">
+              <h4>1. Super Rotation (SRS)</h4>
+              <p>Tap <strong>↻ ROTATE</strong> or <strong>↺ CCW</strong>. Wall-kicks allow rotating flush against boundaries!</p>
+            </div>
+          </div>
+
+          <div class="tutorial-card">
+            <img src="../tetris-assets/page-2/drop-guide.png" alt="Lateral & Drop" class="tutorial-icon">
+            <div class="tutorial-text">
+              <h4>2. Lateral Drift & Drop</h4>
+              <p>Use <strong>◀ LEFT</strong> / <strong>RIGHT ▶</strong> to steer. Hold <strong>▼ SOFT DROP</strong> for fast placement.</p>
+            </div>
+          </div>
+
+          <div class="tutorial-card">
+            <img src="../tetris-assets/page-2/clear-guide.png" alt="Line Clearing" class="tutorial-icon">
+            <div class="tutorial-text">
+              <h4>3. Matrix Line Clears</h4>
+              <p>Fill complete rows of 10 cells. Clearing 4 lines simultaneously triggers a massive <strong>TETRIS</strong> bonus!</p>
+            </div>
+          </div>
+
+          <div class="tutorial-card">
+            <img src="../tetris-assets/page-2/hold-guide.png" alt="Piece Hold" class="tutorial-icon">
+            <div class="tutorial-text">
+              <h4>4. Hold Chamber</h4>
+              <p>Tap <strong>⇲ HOLD</strong> to save a critical piece (like the cyan I-bar) for emergencies.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer class="tutorial-footer-bar">
+        <button class="btn-primary" id="btn-tutorial-play" aria-label="Start Sector 1">
+          <kbd class="keycap">SPACE</kbd> 🕹️ PLAY LEVEL 1 NOW
+        </button>
+        <button class="btn-secondary" id="btn-tutorial-continue" aria-label="View Sector Map">
+          🗺️ SECTOR MAP
+        </button>
+      </footer>
+    </section>
+
+    <!-- ======================================================================
+         PAGE 3: SECTOR MAP
+         ====================================================================== -->
+    <section class="screen" id="screen-map" aria-label="Sector Matrix Map">
+      <img src="../tetris-assets/page-3/map-bg.png" alt="" class="screen-bg">
+
+      <header class="map-top-bar">
+        <button class="btn-icon" id="btn-map-exit" aria-label="Exit Game">✕</button>
+        <div class="star-tally">
+          <span class="star-tally-icon">⭐</span>
+          <span class="star-tally-count" id="total-stars-count">0 / 36</span>
+        </div>
+        <button class="btn-icon btn-mute" aria-label="Toggle Sound">🔊</button>
+      </header>
+
+      <div class="map-scroll-container" id="levels-container">
+        <!-- Dynamic Level Cards are injected by tetris.js -->
+      </div>
+
+      <!-- Floating Bottom Quick Play Bar on Sector Map -->
+      <div class="map-floating-bar" id="map-floating-bar">
+        <button class="btn-primary btn-map-quick-launch" id="btn-map-quick-launch" aria-label="Play Next Sector">
+          <kbd class="keycap">SPACE</kbd>
+          <span class="launch-title">🕹️ PLAY SECTOR 1 NOW</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         PAGE 4: GAMEPLAY ARENA & TACTILE CONTROLS DECK
+         ====================================================================== -->
+    <section class="screen" id="screen-game" aria-label="Gameplay Arena">
+      <img src="../tetris-assets/page-4/tetris-backdrop.png" alt="" class="screen-bg">
+
+      <!-- Top HUD -->
+      <header class="game-hud-bar">
+        <div class="hud-left">
+          <button class="btn-icon" id="btn-game-map" aria-label="Return to Sector Map">🗺️</button>
+          <button class="btn-icon" id="btn-game-exit" aria-label="Exit Game">✕</button>
+        </div>
+        <div class="hud-center">
+          <div class="hud-level-title" id="hud-level-name">Sector 1: Calibration Matrix</div>
+          <div class="hud-stats-pill">
+            <span id="hud-lines-label">LINES: 0 / 3</span>
+            <span class="hud-divider">|</span>
+            <span id="hud-score-label">SCORE: 0</span>
+          </div>
+        </div>
+        <div class="hud-right">
+          <button class="btn-icon btn-mute" aria-label="Toggle Sound">🔊</button>
+          <button class="btn-icon" id="btn-game-retry" aria-label="Retry Level">↺</button>
+        </div>
+      </header>
+
+      <!-- Matrix Arena Middle Section -->
+      <div class="arena-middle-stage">
+        <!-- Left Side Bay: Hold Box -->
+        <aside class="side-bay side-bay-left">
+          <div class="mini-box hold-box">
+            <span class="mini-box-label">HOLD</span>
+            <canvas id="hold-canvas" width="60" height="60" class="mini-canvas"></canvas>
+          </div>
+          <div class="side-stat-box">
+            <span class="side-stat-label">LEVEL</span>
+            <span class="side-stat-value" id="side-stat-level">1</span>
+          </div>
+          <div class="side-stat-box">
+            <span class="side-stat-label">TARGET</span>
+            <span class="side-stat-value" id="side-stat-target">3L</span>
+          </div>
+        </aside>
+
+        <!-- Center: 10x20 Matrix Playfield Canvas -->
+        <div class="canvas-wrap" id="canvas-wrap">
+          <canvas id="game-canvas" width="300" height="600"></canvas>
+          <!-- Touch Gesture Recognition Layer -->
+          <div class="canvas-gesture-pad" id="canvas-gesture-pad"></div>
+        </div>
+
+        <!-- Right Side Bay: Next Box -->
+        <aside class="side-bay side-bay-right">
+          <div class="mini-box next-box">
+            <span class="mini-box-label">NEXT</span>
+            <canvas id="next-canvas" width="60" height="60" class="mini-canvas"></canvas>
+          </div>
+          <div class="side-stat-box">
+            <span class="side-stat-label">SCORE</span>
+            <span class="side-stat-value" id="side-stat-score">0</span>
+          </div>
+          <div class="side-stat-box">
+            <span class="side-stat-label">HIGH</span>
+            <span class="side-stat-value" id="side-stat-high">0</span>
+          </div>
+        </aside>
+      </div>
+
+      <!-- Bottom Interactive Tactical Controls Deck with Permanent On-Screen Keys -->
+      <footer class="game-controls-bar tetris-deck" id="game-controls-bar">
+        <!-- Row 1: Tactical Action Keys (Hold, Rotate CCW, Rotate CW) -->
+        <div class="deck-row deck-row-actions">
+          <button class="deck-btn btn-action btn-hold" id="btn-hold" aria-label="Hold Piece">
+            <kbd class="deck-kbd">C</kbd>
+            <span class="btn-text">⇲ HOLD</span>
+          </button>
+          <button class="deck-btn btn-action btn-rot-ccw" id="btn-rot-ccw" aria-label="Rotate Counter-Clockwise">
+            <kbd class="deck-kbd">Z</kbd>
+            <span class="btn-text">↺ CCW</span>
+          </button>
+          <button class="deck-btn btn-action btn-rot-cw" id="btn-rot-cw" aria-label="Rotate Clockwise">
+            <kbd class="deck-kbd">▲ / X</kbd>
+            <span class="btn-text">↻ ROTATE</span>
+          </button>
+        </div>
+
+        <!-- Row 2: Directional Steering (Left, Soft Drop, Right) -->
+        <div class="deck-row deck-row-steer">
+          <button class="deck-btn btn-steer btn-left" id="btn-left" aria-label="Move Left">
+            <kbd class="deck-kbd">◄</kbd>
+            <span class="btn-text">LEFT</span>
+          </button>
+          <button class="deck-btn btn-steer btn-soft-drop" id="btn-soft-drop" aria-label="Soft Drop">
+            <kbd class="deck-kbd">▼</kbd>
+            <span class="btn-text">SOFT DROP</span>
+          </button>
+          <button class="deck-btn btn-steer btn-right" id="btn-right" aria-label="Move Right">
+            <kbd class="deck-kbd">►</kbd>
+            <span class="btn-text">RIGHT</span>
+          </button>
+        </div>
+
+        <!-- Row 3: Giant Tactile Hard Drop Key -->
+        <div class="deck-row deck-row-hard-drop">
+          <button class="deck-btn btn-hard-drop-giant" id="btn-hard-drop" aria-label="Hard Drop Piece Immediately">
+            <kbd class="deck-kbd">SPACE</kbd>
+            <span class="btn-text">⚡ HARD DROP PIECE</span>
+          </button>
+        </div>
+
+        <!-- Row 4: Auxiliary System Keys -->
+        <div class="deck-row deck-row-aux">
+          <button class="deck-aux-btn" id="btn-deck-retry" aria-label="Retry Level">
+            <kbd>R</kbd> Retry
+          </button>
+          <button class="deck-aux-btn" id="btn-deck-rules" aria-label="Rules & Guide">
+            <kbd>I</kbd> Rules
+          </button>
+          <button class="deck-aux-btn" id="btn-deck-map" aria-label="Sector Map">
+            <kbd>MAP</kbd> Levels
+          </button>
+          <button class="deck-aux-btn" id="btn-deck-exit" aria-label="Exit Game">
+            <kbd>ESC</kbd> Exit
+          </button>
+        </div>
+      </footer>
+
+      <!-- Mission Rules Sheet Modal -->
+      <div class="rules-modal" id="modal-rules" role="dialog" aria-modal="true" aria-label="Mission Rules">
+        <div class="rules-sheet-content">
+          <div class="rules-sheet-header">
+            <h3 class="rules-sheet-title">Tetris Rules & On-Screen Keys</h3>
+            <button class="btn-icon" id="btn-close-rules" aria-label="Close Rules">✕</button>
+          </div>
+          <div class="rules-sheet-body">
+            <div class="rule-item">
+              <span class="rule-icon">🕹️</span>
+              <div class="rule-text">
+                <strong>Mobile On-Screen Keys</strong>
+                <p>• <strong>Steering:</strong> Tap or hold <strong>◀ LEFT</strong> / <strong>RIGHT ▶</strong> to glide pieces laterally.<br>
+                • <strong>Soft Drop:</strong> Hold <strong>▼ SOFT DROP</strong> to fall at 10x speed.<br>
+                • <strong>Instant Hard Drop:</strong> Tap the giant glowing <strong>⚡ HARD DROP</strong> button to instantly lock the piece.<br>
+                • <strong>Rotation:</strong> Tap <strong>↻ ROTATE</strong> (Clockwise) or <strong>↺ CCW</strong>.<br>
+                • <strong>Hold Chamber:</strong> Tap <strong>⇲ HOLD</strong> to save the current piece for later.</p>
+              </div>
+            </div>
+            <div class="rule-item">
+              <span class="rule-icon">📱</span>
+              <div class="rule-text">
+                <strong>Swipe Gestures on Playfield</strong>
+                <p>• Swipe <strong>Left / Right</strong> on the matrix to slide.<br>
+                • Swipe <strong>Down</strong> to soft drop.<br>
+                • Swipe <strong>Up</strong> or tap with two fingers to hard drop immediately.<br>
+                • Tap the matrix to rotate clockwise.</p>
+              </div>
+            </div>
+            <div class="rule-item">
+              <span class="rule-icon">⭐</span>
+              <div class="rule-text">
+                <strong>Scoring & Star Ratings</strong>
+                <p>• 1 Line: 100 × Level | 2 Lines: 300 × Level<br>
+                • 3 Lines: 500 × Level | 4 Lines (TETRIS): 800 × Level!<br>
+                • Earn 1 to 3 stars per sector based on efficiency and combos.</p>
+              </div>
+            </div>
+          </div>
+          <div class="rules-sheet-footer">
+            <button class="btn-primary" id="btn-rules-understand">RESUME MATRIX</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Victory Modal Overlay -->
+      <div class="game-modal" id="modal-victory" role="dialog" aria-modal="true" aria-label="Sector Victory">
+        <div class="modal-emblem-wrap">
+          <span class="modal-emblem-icon">🏆</span>
+        </div>
+        <h2 class="modal-title victory">Sector Calibrated!</h2>
+        <p class="modal-desc" id="victory-desc">Matrix stabilization achieved. All target rows synthesized.</p>
+        <div class="modal-stars-row" id="victory-stars-row">
+          <span class="modal-star-symbol">⭐</span>
+          <span class="modal-star-symbol">⭐</span>
+          <span class="modal-star-symbol">⭐</span>
+        </div>
+        <div class="modal-stats">
+          <div class="stat-box">
+            <span class="stat-label">Lines Cleared</span>
+            <span class="stat-value" id="victory-lines">3/3</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-label">Final Score</span>
+            <span class="stat-value" id="victory-score">1,200</span>
+          </div>
+        </div>
+        <div class="modal-buttons">
+          <button class="btn-primary" id="btn-next-level">Next Sector ▶</button>
+          <button class="btn-secondary" id="btn-replay-level">Replay</button>
+          <button class="btn-secondary" id="btn-victory-map">Sector Map</button>
+        </div>
+      </div>
+
+      <!-- Defeat / Top-Out Modal Overlay -->
+      <div class="game-modal" id="modal-defeat" role="dialog" aria-modal="true" aria-label="Matrix Buffer Overflow">
+        <div class="modal-emblem-wrap">
+          <span class="modal-emblem-icon">⚠️</span>
+        </div>
+        <h2 class="modal-title defeat">Buffer Overflow!</h2>
+        <p class="modal-desc" id="defeat-reason">Polymer containment breach: Blocks exceeded visible matrix ceiling!</p>
+        <div class="modal-stats">
+          <div class="stat-box">
+            <span class="stat-label">Lines Cleared</span>
+            <span class="stat-value" id="defeat-lines">2</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-label">Final Score</span>
+            <span class="stat-value" id="defeat-score">450</span>
+          </div>
+        </div>
+        <div class="modal-buttons">
+          <button class="btn-primary" id="btn-defeat-retry">Recalibrate & Retry</button>
+          <button class="btn-secondary" id="btn-defeat-map">Sector Map</button>
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <script src="tetris-core.js?v=1"></script>
+  <script src="tetris-audio.js?v=1"></script>
+  <script src="tetris.js?v=1"></script>
+</body>
+</html>

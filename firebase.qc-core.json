@@ -17,7 +17,7 @@
         ]
       },
       {
-        "source": "/assets/see-saw-*/**",
+        "source": "/assets/tetris-*/**",
         "headers": [
           {
             "key": "Cache-Control",

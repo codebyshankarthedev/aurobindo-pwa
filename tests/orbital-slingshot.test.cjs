@@ -375,11 +375,11 @@ describe('Orbital Slingshot Test Suite', () => {
       assert.ok(gameGalleryIdx !== -1, 'index.html missing .game-gallery');
 
       const slingshotIdx = indexHtml.indexOf('poster-orbital-slingshot', gameGalleryIdx);
-      const seeSawIdx = indexHtml.indexOf('poster-see-saw', gameGalleryIdx);
+      const nextGameIdx = indexHtml.indexOf('poster-tetris', gameGalleryIdx);
 
       assert.ok(slingshotIdx !== -1, 'orbital-slingshot poster missing in .game-gallery');
-      assert.ok(seeSawIdx !== -1, 'see-saw poster missing in .game-gallery');
-      assert.ok(slingshotIdx < seeSawIdx, 'orbital-slingshot is not the leading item in .game-gallery');
+      assert.ok(nextGameIdx !== -1, 'tetris poster missing in .game-gallery');
+      assert.ok(slingshotIdx < nextGameIdx, 'orbital-slingshot is not the leading item in .game-gallery');
     });
 
     test('index.html contains orbital-slingshot as first poster in #rc-game-gallery', () => {
@@ -388,11 +388,11 @@ describe('Orbital Slingshot Test Suite', () => {
       assert.ok(rcGalleryIdx !== -1, 'index.html missing #rc-game-gallery');
 
       const slingshotIdx = indexHtml.indexOf('poster-orbital-slingshot', rcGalleryIdx);
-      const seeSawIdx = indexHtml.indexOf('poster-see-saw', rcGalleryIdx);
+      const nextGameIdx = indexHtml.indexOf('poster-tetris', rcGalleryIdx);
 
       assert.ok(slingshotIdx !== -1, 'orbital-slingshot poster missing in #rc-game-gallery');
-      assert.ok(seeSawIdx !== -1, 'see-saw poster missing in #rc-game-gallery');
-      assert.ok(slingshotIdx < seeSawIdx, 'orbital-slingshot is not the leading item in #rc-game-gallery');
+      assert.ok(nextGameIdx !== -1, 'tetris poster missing in #rc-game-gallery');
+      assert.ok(slingshotIdx < nextGameIdx, 'orbital-slingshot is not the leading item in #rc-game-gallery');
     });
 
     test('firebase.qc-core.json contains no-cache rule for orbital-slingshot', () => {

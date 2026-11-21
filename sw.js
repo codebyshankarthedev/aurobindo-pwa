@@ -1,5 +1,5 @@
 // QC Core — Root Service Worker
-const CACHE = 'qc-core-v107';
+const CACHE = 'qc-core-v108';
 
 self.addEventListener('install', (event) => {
   self.skipWaiting();
@@ -16,10 +16,10 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-  // Never cache orbital-slingshot or see-saw assets or scripts (force network fetch with no-store)
+  // Never cache orbital-slingshot or tetris assets or scripts (force network fetch with no-store)
   if (
     event.request.url.includes('/assets/orbital-slingshot-') ||
-    event.request.url.includes('/assets/see-saw-')
+    event.request.url.includes('/assets/tetris-')
   ) {
     event.respondWith(fetch(event.request, { cache: 'no-store' }));
     return;

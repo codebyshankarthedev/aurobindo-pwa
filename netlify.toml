@@ -25,9 +25,9 @@
     Pragma = "no-cache"
     Expires = "0"
 
-# No-cache headers for See Saw dynamic scripts & assets
+# No-cache headers for Tetris dynamic scripts & assets
 [[headers]]
-  for = "/assets/see-saw-*/**"
+  for = "/assets/tetris-*/**"
   [headers.values]
     Cache-Control = "no-cache, no-store, must-revalidate"
     Pragma = "no-cache"

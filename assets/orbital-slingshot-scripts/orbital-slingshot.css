@@ -135,14 +135,14 @@ img {
 .screen {
   position: absolute;
   inset: 0;
-  display: none;
+  display: none !important;
   flex-direction: column;
   overflow: hidden;
   z-index: 10;
 }
 
 .screen.active {
-  display: flex;
+  display: flex !important;
 }
 
 /* Background layers for screens (z-index: 0 so it's never behind stage bg) */

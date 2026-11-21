@@ -19,9 +19,9 @@ const criticalFiles = [
   'assets/orbital-slingshot-scripts/orbital-slingshot.html',
   'assets/orbital-slingshot-scripts/orbital-slingshot.js',
   'assets/orbital-slingshot-scripts/orbital-slingshot-core.js',
-  'assets/see-saw-scripts/see-saw.html',
-  'assets/see-saw-scripts/see-saw.js',
-  'assets/see-saw-scripts/see-saw-core.js'
+  'assets/tetris-scripts/tetris.html',
+  'assets/tetris-scripts/tetris.js',
+  'assets/tetris-scripts/tetris-core.js'
 ];
 
 console.log('📦 [Netlify Build] Verifying critical production files...');
@@ -39,8 +39,8 @@ console.log('🔍 [Netlify Build] Checking JavaScript syntax...');
 const jsFilesToCheck = [
   'assets/orbital-slingshot-scripts/orbital-slingshot-core.js',
   'assets/orbital-slingshot-scripts/orbital-slingshot.js',
-  'assets/see-saw-scripts/see-saw-core.js',
-  'assets/see-saw-scripts/see-saw.js'
+  'assets/tetris-scripts/tetris-core.js',
+  'assets/tetris-scripts/tetris.js'
 ];
 
 for (const f of jsFilesToCheck) {
@@ -51,8 +51,8 @@ console.log('✅ JavaScript syntax valid for all game scripts.');
 // 3. Automated Unit & Integration Tests
 console.log('🧪 [Netlify Build] Running automated unit test suites...');
 try {
-  execSync('node --test tests/orbital-slingshot.test.cjs tests/see-saw.test.cjs', { stdio: 'inherit' });
-  console.log('✅ All 45 tests passed successfully!');
+  execSync('node --test tests/orbital-slingshot.test.cjs tests/tetris.test.cjs', { stdio: 'inherit' });
+  console.log('✅ All unit tests passed successfully!');
 } catch (err) {
   console.error('❌ Test suite execution failed:', err);
   process.exit(1);
