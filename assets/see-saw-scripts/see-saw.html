@@ -117,8 +117,13 @@
         </div>
       </div>
 
-      <div class="tutorial-footer" style="display: flex; justify-content: center; margin-top: 16px;">
-        <button class="btn-primary" id="btn-tutorial-continue" aria-label="Enter Laboratories">Enter Laboratories</button>
+      <div class="tutorial-footer" style="display: flex; gap: calc(1.5 * var(--u)); justify-content: center; width: 100%;">
+        <button class="btn-primary" id="btn-tutorial-play" aria-label="Play Station 1" style="flex: 1.2;">
+          <kbd class="keycap">SPACE</kbd> ⚡ PLAY STATION 1
+        </button>
+        <button class="btn-secondary" id="btn-tutorial-continue" aria-label="Stations Map" style="flex: 1;">
+          🗺️ Stations Map
+        </button>
       </div>
     </section>
 
@@ -138,7 +143,28 @@
       </header>
 
       <div class="map-scroll-container" id="levels-container">
-        <!-- Populated dynamically -->
+        <!-- Default Initial Playable Card -->
+        <div class="level-card" role="button" tabindex="0" aria-label="Station 1: Calibration Basics" id="fallback-station-1">
+          <div class="level-card-left">
+            <img src="../see-saw-assets/page-3/lab-badge-1.png" alt="Standardization Lab" class="station-badge" onerror="this.style.display='none'">
+            <div class="level-info">
+              <span class="level-number">Station 1</span>
+              <span class="level-name">Calibration Basics</span>
+              <span class="level-sector-name">Standardization Lab</span>
+            </div>
+          </div>
+          <div class="level-card-right">
+            <button class="btn-level-play-pill">CALIBRATE ▶</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Floating Bottom Quick Play Bar on Station Map -->
+      <div class="map-floating-bar" id="map-floating-bar">
+        <button class="btn-primary btn-map-quick-launch" id="btn-map-quick-launch" aria-label="Play Next Station">
+          <kbd class="keycap">SPACE</kbd>
+          <span class="launch-title">⚡ PLAY STATION 1 NOW</span>
+        </button>
       </div>
     </section>
 

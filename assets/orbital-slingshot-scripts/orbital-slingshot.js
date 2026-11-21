@@ -202,22 +202,32 @@
   function renderSectorMap() {
     const container = document.getElementById('levels-container');
     const totalStarsEl = document.getElementById('total-stars-count');
+    if (!container) return;
     container.innerHTML = '';
 
-    const totalStars = Object.values(saveData.levelStars).reduce((sum, s) => sum + s, 0);
-    totalStarsEl.textContent = `${totalStars} / 36`;
+    const starsObj = (saveData && saveData.levelStars) ? saveData.levelStars : { 1: 0 };
+    const totalStars = Object.values(starsObj).reduce((sum, s) => sum + (Number(s) || 0), 0);
+    if (totalStarsEl) totalStarsEl.textContent = `${totalStars} / 36`;
+
+    const unlocked = (saveData && Array.isArray(saveData.unlockedLevels) && saveData.unlockedLevels.length > 0)
+      ? saveData.unlockedLevels
+      : [1];
+
+    let latestUnlockedLevel = Core.LEVELS[0];
 
     Core.LEVELS.forEach(level => {
-      const isUnlocked = saveData.unlockedLevels.includes(level.id);
-      const starsEarned = saveData.levelStars[level.id] || 0;
+      const isUnlocked = unlocked.includes(level.id);
+      if (isUnlocked) latestUnlockedLevel = level;
+      const starsEarned = (saveData && saveData.levelStars && saveData.levelStars[level.id]) || 0;
       const card = document.createElement('div');
-      card.className = `level-card ${isUnlocked ? '' : 'locked'}`;
+      card.className = `level-card ${isUnlocked ? 'unlocked' : 'locked'}`;
       card.setAttribute('role', 'button');
+      card.setAttribute('tabindex', '0');
       card.setAttribute('aria-label', `Sector ${level.id}: ${level.title}`);
 
       card.innerHTML = `
         <div class="level-card-left">
-          <img src="../orbital-slingshot-assets/page-3/${level.sectorBadge}.png" alt="${level.sector}" class="sector-badge">
+          <img src="../orbital-slingshot-assets/page-3/${level.sectorBadge}.png" alt="${level.sector}" class="sector-badge" onerror="this.style.display='none'">
           <div class="level-info">
             <span class="level-number">Sector ${level.id}</span>
             <span class="level-name">${level.title}</span>
@@ -226,7 +236,7 @@
         </div>
         <div class="level-card-right">
           ${isUnlocked
-            ? `<img src="../orbital-slingshot-assets/page-3/star-badge-${starsEarned}.png" alt="${starsEarned} stars" class="level-star-badge">`
+            ? `<div class="stars-earned-box">${'★'.repeat(starsEarned)}${'☆'.repeat(3 - starsEarned)}</div><button class="btn-level-play-pill">PLAY ▶</button>`
             : `<img src="../orbital-slingshot-assets/page-3/lock-icon.png" alt="Locked" class="level-lock-badge">`
           }
         </div>
@@ -241,14 +251,23 @@
       container.appendChild(card);
     });
 
+    // Update floating quick launch button target
+    const mapQuickBtn = document.getElementById('btn-map-quick-launch');
+    if (mapQuickBtn) {
+      const titleSpan = mapQuickBtn.querySelector('.launch-title');
+      if (titleSpan) {
+        titleSpan.textContent = `🚀 PLAY SECTOR ${latestUnlockedLevel.id} NOW`;
+      }
+    }
+
     // Endless Mode Card
-    if (saveData.endlessUnlocked) {
+    if (saveData && saveData.endlessUnlocked) {
       const endlessCard = document.createElement('div');
-      endlessCard.className = 'level-card';
+      endlessCard.className = 'level-card unlocked';
       endlessCard.style.borderColor = 'var(--color-warp)';
       endlessCard.innerHTML = `
         <div class="level-card-left">
-          <img src="../orbital-slingshot-assets/page-3/sector-void.png" alt="Endless" class="sector-badge">
+          <img src="../orbital-slingshot-assets/page-3/sector-void.png" alt="Endless" class="sector-badge" onerror="this.style.display='none'">
           <div class="level-info">
             <span class="level-number">Endless Void</span>
             <span class="level-name">Procedural Cosmos</span>
@@ -256,7 +275,7 @@
           </div>
         </div>
         <div class="level-card-right">
-          <button class="btn-secondary" style="padding: 6px 12px; font-size: 11px;">WARP</button>
+          <button class="btn-level-play-pill" style="background: linear-gradient(135deg, #b5179e 0%, #7209b7 100%);">WARP ▶</button>
         </div>
       `;
       addTapListener(endlessCard, () => {
@@ -1039,9 +1058,23 @@
     // Page 2: Tutorial
     addTapListener(document.getElementById('btn-tutorial-back'), () => showScreen('landing'));
     addTapListener(document.getElementById('btn-tutorial-continue'), () => showScreen('map'));
+    addTapListener(document.getElementById('btn-tutorial-play'), () => startLevel(Core.LEVELS[0]));
 
     // Page 3: Map
     addTapListener(document.getElementById('btn-map-exit'), exitGame);
+    addTapListener(document.getElementById('btn-map-quick-launch'), () => {
+      const unlocked = (saveData && Array.isArray(saveData.unlockedLevels) && saveData.unlockedLevels.length > 0)
+        ? saveData.unlockedLevels
+        : [1];
+      const targetId = Math.max(...unlocked);
+      const targetLevel = Core.LEVELS.find(l => l.id === targetId) || Core.LEVELS[0];
+      startLevel(targetLevel);
+    });
+
+    const fallbackSector1 = document.getElementById('fallback-sector-1');
+    if (fallbackSector1) {
+      addTapListener(fallbackSector1, () => startLevel(Core.LEVELS[0]));
+    }
 
     const hangarDrawer = document.getElementById('hangar-drawer');
     addTapListener(document.getElementById('btn-open-hangar'), () => {
@@ -1306,6 +1339,7 @@
   function init() {
     updateViewportUnits();
     setupEventListeners();
+    renderSectorMap();
     if (saveData.soundMuted) {
       audio.setMuted(true);
       document.querySelectorAll('.btn-mute').forEach(b => {

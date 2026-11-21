@@ -443,8 +443,15 @@
       const raw = storage.getItem(STORAGE_KEY);
       if (!raw) return getDefaultSaveData();
       const parsed = JSON.parse(raw);
-      if (!parsed || parsed.version !== 1) return getDefaultSaveData();
-      return parsed;
+      if (!parsed || typeof parsed !== 'object') return getDefaultSaveData();
+      const def = getDefaultSaveData();
+      return {
+        ...def,
+        ...parsed,
+        unlockedLevels: Array.isArray(parsed.unlockedLevels) && parsed.unlockedLevels.length > 0 ? parsed.unlockedLevels : def.unlockedLevels,
+        levelStars: (parsed.levelStars && typeof parsed.levelStars === 'object') ? { ...def.levelStars, ...parsed.levelStars } : def.levelStars,
+        levelScores: (parsed.levelScores && typeof parsed.levelScores === 'object') ? { ...def.levelScores, ...parsed.levelScores } : def.levelScores
+      };
     } catch (e) {
       return getDefaultSaveData();
     }

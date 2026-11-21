@@ -8,12 +8,12 @@
   Pragma: no-cache
   Expires: 0
 
-/assets/orbital-slingshot-*/*
+/assets/orbital-slingshot-*/**
   Cache-Control: no-cache, no-store, must-revalidate
   Pragma: no-cache
   Expires: 0
 
-/assets/see-saw-*/*
+/assets/see-saw-*/**
   Cache-Control: no-cache, no-store, must-revalidate
   Pragma: no-cache
   Expires: 0

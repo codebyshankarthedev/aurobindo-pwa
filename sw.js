@@ -1,5 +1,5 @@
 // QC Core — Root Service Worker
-const CACHE = 'qc-core-v106';
+const CACHE = 'qc-core-v107';
 
 self.addEventListener('install', (event) => {
   self.skipWaiting();

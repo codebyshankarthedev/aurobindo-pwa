@@ -181,22 +181,32 @@
   function renderStationMap() {
     const container = document.getElementById('levels-container');
     const totalStarsEl = document.getElementById('total-stars-count');
+    if (!container) return;
     container.innerHTML = '';
 
-    const totalStars = Object.values(saveData.levelStars).reduce((sum, s) => sum + s, 0);
-    totalStarsEl.textContent = `${totalStars} / 36`;
+    const starsObj = (saveData && saveData.levelStars) ? saveData.levelStars : { 1: 0 };
+    const totalStars = Object.values(starsObj).reduce((sum, s) => sum + (Number(s) || 0), 0);
+    if (totalStarsEl) totalStarsEl.textContent = `${totalStars} / 36`;
+
+    const unlocked = (saveData && Array.isArray(saveData.unlockedLevels) && saveData.unlockedLevels.length > 0)
+      ? saveData.unlockedLevels
+      : [1];
+
+    let latestUnlocked = Core.LEVELS[0];
 
     Core.LEVELS.forEach(level => {
-      const isUnlocked = saveData.unlockedLevels.includes(level.id);
-      const starsEarned = saveData.levelStars[level.id] || 0;
+      const isUnlocked = unlocked.includes(level.id);
+      if (isUnlocked) latestUnlocked = level;
+      const starsEarned = (saveData && saveData.levelStars && saveData.levelStars[level.id]) || 0;
       const card = document.createElement('div');
-      card.className = `level-card ${isUnlocked ? '' : 'locked'}`;
+      card.className = `level-card ${isUnlocked ? 'unlocked' : 'locked'}`;
       card.setAttribute('role', 'button');
+      card.setAttribute('tabindex', '0');
       card.setAttribute('aria-label', `Station ${level.id}: ${level.title}`);
 
       card.innerHTML = `
         <div class="level-card-left">
-          <img src="../see-saw-assets/page-3/${level.badge}.png" alt="${level.labStation}" class="station-badge">
+          <img src="../see-saw-assets/page-3/${level.badge}.png" alt="${level.labStation}" class="station-badge" onerror="this.style.display='none'">
           <div class="level-info">
             <span class="level-number">Station ${level.id}</span>
             <span class="level-name">${level.title}</span>
@@ -205,7 +215,7 @@
         </div>
         <div class="level-card-right">
           ${isUnlocked
-            ? `<img src="../see-saw-assets/page-3/star-badge-${starsEarned}.png" alt="${starsEarned} stars" class="level-star-badge">`
+            ? `<div class="stars-earned-box">${'★'.repeat(starsEarned)}${'☆'.repeat(3 - starsEarned)}</div><button class="btn-level-play-pill">CALIBRATE ▶</button>`
             : `<img src="../see-saw-assets/page-3/lock-icon.png" alt="Locked" class="level-lock-badge">`
           }
         </div>
@@ -220,14 +230,22 @@
       container.appendChild(card);
     });
 
+    const mapQuickBtn = document.getElementById('btn-map-quick-launch');
+    if (mapQuickBtn) {
+      const titleSpan = mapQuickBtn.querySelector('.launch-title');
+      if (titleSpan) {
+        titleSpan.textContent = `⚡ PLAY STATION ${latestUnlocked.id} NOW`;
+      }
+    }
+
     // Endless Mode Card
-    if (saveData.endlessUnlocked) {
+    if (saveData && saveData.endlessUnlocked) {
       const endlessCard = document.createElement('div');
-      endlessCard.className = 'level-card';
+      endlessCard.className = 'level-card unlocked';
       endlessCard.style.borderColor = 'var(--color-teal)';
       endlessCard.innerHTML = `
         <div class="level-card-left">
-          <img src="../see-saw-assets/page-3/lab-badge-6.png" alt="Endless" class="station-badge">
+          <img src="../see-saw-assets/page-3/lab-badge-6.png" alt="Endless" class="station-badge" onerror="this.style.display='none'">
           <div class="level-info">
             <span class="level-number">Endless Titration</span>
             <span class="level-name">Continuous Batch Assay</span>
@@ -235,7 +253,7 @@
           </div>
         </div>
         <div class="level-card-right">
-          <button class="btn-secondary" style="padding: 6px 12px; font-size: 11px;">ENTER</button>
+          <button class="btn-level-play-pill">ENTER ▶</button>
         </div>
       `;
       addTapListener(endlessCard, () => {
@@ -396,10 +414,12 @@
       const item = document.createElement('div');
       item.className = `weight-item ${selectedWeightIndex === idx ? 'selected' : ''}`;
       item.setAttribute('role', 'button');
+      item.setAttribute('tabindex', '0');
       item.setAttribute('aria-label', `Weight ${weight.label}`);
 
       item.innerHTML = `
-        <img src="../see-saw-assets/page-4/${weight.sprite}" alt="${weight.label}" class="weight-sprite">
+        <kbd class="keycap" style="font-size: calc(1.4 * var(--u)); padding: 0 4px;">W${idx + 1}</kbd>
+        <img src="../see-saw-assets/page-4/${weight.sprite}" alt="${weight.label}" class="weight-sprite" onerror="this.style.display='none'">
         <span class="weight-label">${weight.label}</span>
       `;
 
@@ -415,6 +435,14 @@
           fromSlotId: null,
           isTouch: e.pointerType === 'touch'
         };
+      });
+
+      addTapListener(item, () => {
+        if (gameState.isBalanced) return;
+        selectedWeightIndex = (selectedWeightIndex === idx) ? null : idx;
+        audio.playSfx('drop');
+        renderRack();
+        updateBeamVisuals();
       });
 
       rackList.appendChild(item);
@@ -750,8 +778,22 @@
 
     addTapListener(document.getElementById('btn-tutorial-back'), () => showScreen('landing'));
     addTapListener(document.getElementById('btn-tutorial-continue'), () => showScreen('map'));
+    addTapListener(document.getElementById('btn-tutorial-play'), () => startLevel(Core.LEVELS[0]));
 
     addTapListener(document.getElementById('btn-map-exit'), exitGame);
+    addTapListener(document.getElementById('btn-map-quick-launch'), () => {
+      const unlocked = (saveData && Array.isArray(saveData.unlockedLevels) && saveData.unlockedLevels.length > 0)
+        ? saveData.unlockedLevels
+        : [1];
+      const targetId = Math.max(...unlocked);
+      const targetLevel = Core.LEVELS.find(l => l.id === targetId) || Core.LEVELS[0];
+      startLevel(targetLevel);
+    });
+
+    const fallbackStation1 = document.getElementById('fallback-station-1');
+    if (fallbackStation1) {
+      addTapListener(fallbackStation1, () => startLevel(Core.LEVELS[0]));
+    }
     addTapListener(document.getElementById('btn-game-map'), () => showScreen('map'));
     addTapListener(document.getElementById('btn-game-exit'), exitGame);
     addTapListener(document.getElementById('btn-game-retry'), () => startLevel(activeLevel));
@@ -936,6 +978,7 @@
   function init() {
     updateViewportUnits();
     setupEventListeners();
+    renderStationMap();
     if (saveData.soundMuted) {
       audio.setMuted(true);
       document.querySelectorAll('.btn-mute').forEach(b => {

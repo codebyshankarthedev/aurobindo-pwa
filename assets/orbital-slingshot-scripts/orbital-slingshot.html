@@ -117,8 +117,13 @@
         </div>
       </div>
 
-      <div class="tutorial-footer">
-        <button class="btn-primary" id="btn-tutorial-continue" aria-label="Launch Campaign">Sector Map</button>
+      <div class="tutorial-footer" style="display: flex; gap: calc(1.5 * var(--u)); justify-content: center; width: 100%;">
+        <button class="btn-primary" id="btn-tutorial-play" aria-label="Play Level 1" style="flex: 1.2;">
+          <kbd class="keycap">SPACE</kbd> 🚀 PLAY SECTOR 1
+        </button>
+        <button class="btn-secondary" id="btn-tutorial-continue" aria-label="Sector Map" style="flex: 1;">
+          🗺️ Sector Map
+        </button>
       </div>
     </section>
 
@@ -139,7 +144,28 @@
       </header>
 
       <div class="map-scroll-container" id="levels-container">
-        <!-- Dynamically populated level cards (Levels 1 to 12 + Endless) -->
+        <!-- Default Initial Playable Card (Guarantees visible buttons even on slow connections) -->
+        <div class="level-card" role="button" tabindex="0" aria-label="Sector 1: Orbit Alpha" id="fallback-sector-1">
+          <div class="level-card-left">
+            <img src="../orbital-slingshot-assets/page-3/sector-earth.png" alt="Sol Gateway" class="sector-badge" onerror="this.style.display='none'">
+            <div class="level-info">
+              <span class="level-number">Sector 1</span>
+              <span class="level-name">Orbit Alpha</span>
+              <span class="level-sector-name">Sol Gateway</span>
+            </div>
+          </div>
+          <div class="level-card-right">
+            <button class="btn-level-play-pill">PLAY ▶</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Floating Bottom Quick Play Bar on Sector Map -->
+      <div class="map-floating-bar" id="map-floating-bar">
+        <button class="btn-primary btn-map-quick-launch" id="btn-map-quick-launch" aria-label="Play Next Sector">
+          <kbd class="keycap">SPACE</kbd>
+          <span class="launch-title">🚀 PLAY SECTOR 1 NOW</span>
+        </button>
       </div>
 
       <!-- Ship Trail Hangar Drawer -->

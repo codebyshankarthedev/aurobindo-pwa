@@ -19,7 +19,7 @@
 
 # No-cache headers for Orbital Slingshot dynamic scripts & assets
 [[headers]]
-  for = "/assets/orbital-slingshot-*/*"
+  for = "/assets/orbital-slingshot-*/**"
   [headers.values]
     Cache-Control = "no-cache, no-store, must-revalidate"
     Pragma = "no-cache"
@@ -27,7 +27,7 @@
 
 # No-cache headers for See Saw dynamic scripts & assets
 [[headers]]
-  for = "/assets/see-saw-*/*"
+  for = "/assets/see-saw-*/**"
   [headers.values]
     Cache-Control = "no-cache, no-store, must-revalidate"
     Pragma = "no-cache"
