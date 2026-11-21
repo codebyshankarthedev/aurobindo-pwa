@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Conveyor Sorter — QC Core Mini-Game</title>
+  <link rel="stylesheet" href="conveyor-sorter.css?v=1">
+</head>
+<body>
+  <!-- Landscape Orientation Warning Overlay -->
+  <div class="rotate-overlay" id="rotate-overlay" role="alert">
+    <div class="rotate-icon"></div>
+    <h2 class="rotate-title">Rotate Your Device</h2>
+    <p class="rotate-desc">Conveyor Sorter requires 9:16 portrait orientation for high-speed conveyor monitoring and sorting.</p>
+  </div>
+
+  <main class="stage" id="stage">
+
+    <!-- ======================================================================
+         PAGE 1: LANDING & REAL ASSET PRELOADER
+         ====================================================================== -->
+    <section class="screen active" id="screen-landing" aria-label="Landing and Preloader">
+      <img src="../conveyor-sorter-assets/page-1/page-1-bg.png" alt="" class="screen-bg">
+
+      <header class="landing-header">
+        <button class="btn-icon" id="btn-landing-exit" aria-label="Exit Game">✕</button>
+        <span class="game-version-pill">QC CONVEYOR SORTER v1.0</span>
+        <button class="btn-icon btn-mute" aria-label="Toggle Sound">🔊</button>
+      </header>
+
+      <div class="landing-hero">
+        <img src="../conveyor-sorter-assets/page-1/emblem.png" alt="Conveyor Emblem" class="landing-emblem">
+        <h1 class="landing-title">CONVEYOR SORTER</h1>
+        <p class="landing-subtitle">ALPHABET & NUMBER QUALITY SORTING</p>
+      </div>
+
+      <div class="preloader-card" id="preloader-card">
+        <div class="preloader-label">
+          <span>INITIALIZING CONVEYOR SENSORS</span>
+          <span class="preloader-percent" id="preloader-percent">0%</span>
+        </div>
+        <div class="preloader-bar-bg">
+          <div class="preloader-bar-fill" id="preloader-bar-fill" style="width: 0%;"></div>
+        </div>
+        <div class="preloader-status" id="preloader-status">Calibrating optical sorting chutes...</div>
+      </div>
+
+      <div class="start-btn-wrap launch-keys-dock" id="start-btn-wrap">
+        <button class="btn-primary btn-launch-key-giant" id="btn-quick-play" aria-label="Quick Launch Level 1">
+          <span class="key-badge"><kbd>SPACE</kbd> or <kbd>TAP</kbd> TO LAUNCH</span>
+          <span class="key-label-text">📦 LAUNCH CONVEYOR SORTER</span>
+        </button>
+
+        <div class="launch-key-legend-row">
+          <button class="btn-secondary btn-launch-key-sub" id="btn-start" aria-label="Mission Briefing">
+            <kbd>ENTER</kbd> 📖 How To Play & SOP
+          </button>
+          <button class="btn-secondary btn-launch-key-sub btn-mute" aria-label="Toggle Sound">
+            <kbd>M</kbd> 🔊 Sound
+          </button>
+        </div>
+        <div class="launch-touch-callout">
+          <span>🎮 DRAG &amp; DROP + ON-SCREEN KEYS ACTIVE &bull; TAP <kbd>📦 LAUNCH</kbd> OR ANYWHERE TO PLAY</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         PAGE 2: STORY & SOP GUIDE
+         ====================================================================== -->
+    <section class="screen" id="screen-tutorial" aria-label="Story and Tutorial">
+      <img src="../conveyor-sorter-assets/page-2/story-bg.png" alt="" class="screen-bg">
+
+      <header class="screen-header">
+        <button class="btn-icon" id="btn-tutorial-back" aria-label="Back">←</button>
+        <h2 class="screen-title">Sorting SOP Guide</h2>
+        <button class="btn-icon btn-mute" aria-label="Toggle Sound">🔊</button>
+      </header>
+
+      <div class="tutorial-scroll-area">
+        <div class="tutorial-briefing-box">
+          <h3>QC Sorting Directives</h3>
+          <p>Tokens bearing Alphabets and Numbers arrive on the moving conveyor. Drag them or use the on-screen buttons to direct each token into its designated containment chamber.</p>
+        </div>
+
+        <div class="tutorial-cards-grid">
+          <div class="tutorial-card">
+            <img src="../conveyor-sorter-assets/page-2/drag-guide.png" alt="Drag and Drop" class="tutorial-icon">
+            <div class="tutorial-text">
+              <h4>1. Drag &amp; Drop Tokens</h4>
+              <p>Touch and drag any token directly from the moving conveyor into the top chambers. Smooth touch lift ensures high visibility!</p>
+            </div>
+          </div>
+
+          <div class="tutorial-card">
+            <img src="../conveyor-sorter-assets/page-2/containers-guide.png" alt="Containers" class="tutorial-icon">
+            <div class="tutorial-text">
+              <h4>2. Dual Chambers</h4>
+              <p><strong>🔤 Alphabets (A, B, C...)</strong> go into the Cyan Left Chamber.<br><strong>🔢 Numbers (1, 2, 3...)</strong> go into the Purple Right Chamber.</p>
+            </div>
+          </div>
+
+          <div class="tutorial-card">
+            <img src="../conveyor-sorter-assets/page-2/keys-guide.png" alt="On-Screen Keys" class="tutorial-icon">
+            <div class="tutorial-text">
+              <h4>3. Instant On-Screen Keys</h4>
+              <p>On mobile, tap <strong>🔤 DROP IN ALPHABETS</strong> or <strong>🔢 DROP IN NUMBERS</strong> to immediately sort the leading token!</p>
+            </div>
+          </div>
+
+          <div class="tutorial-card">
+            <img src="../conveyor-sorter-assets/page-2/score-guide.png" alt="Combos" class="tutorial-icon">
+            <div class="tutorial-text">
+              <h4>4. Streaks &amp; Combos</h4>
+              <p>Consecutive correct sorts earn streak multipliers! Prevent tokens from sliding past the right edge without sorting.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer class="tutorial-footer-bar">
+        <button class="btn-primary" id="btn-tutorial-play" aria-label="Start Sector 1">
+          <kbd class="keycap">SPACE</kbd> 🕹️ PLAY LEVEL 1 NOW
+        </button>
+        <button class="btn-secondary" id="btn-tutorial-continue" aria-label="View Sector Map">
+          🗺️ SECTOR MAP
+        </button>
+      </footer>
+    </section>
+
+    <!-- ======================================================================
+         PAGE 3: SECTOR MAP
+         ====================================================================== -->
+    <section class="screen" id="screen-map" aria-label="Sector Conveyor Map">
+      <img src="../conveyor-sorter-assets/page-3/map-bg.png" alt="" class="screen-bg">
+
+      <header class="map-top-bar">
+        <button class="btn-icon" id="btn-map-exit" aria-label="Exit Game">✕</button>
+        <div class="star-tally">
+          <span class="star-tally-icon">⭐</span>
+          <span class="star-tally-count" id="total-stars-count">0 / 36</span>
+        </div>
+        <button class="btn-icon btn-mute" aria-label="Toggle Sound">🔊</button>
+      </header>
+
+      <div class="map-scroll-container" id="levels-container">
+        <!-- Dynamic Level Cards injected by conveyor-sorter.js -->
+      </div>
+
+      <!-- Floating Bottom Quick Play Bar on Sector Map -->
+      <div class="map-floating-bar" id="map-floating-bar">
+        <button class="btn-primary btn-map-quick-launch" id="btn-map-quick-launch" aria-label="Play Next Sector">
+          <kbd class="keycap">SPACE</kbd>
+          <span class="launch-title">📦 PLAY SECTOR 1 NOW</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         PAGE 4: GAMEPLAY ARENA & TACTILE ON-SCREEN CONTROLS
+         ====================================================================== -->
+    <section class="screen" id="screen-game" aria-label="Gameplay Arena">
+      <img src="../conveyor-sorter-assets/page-4/conveyor-backdrop.png" alt="" class="screen-bg">
+
+      <!-- Top HUD Bar -->
+      <header class="game-hud-bar">
+        <div class="hud-left">
+          <button class="btn-icon" id="btn-game-map" aria-label="Return to Sector Map">🗺️</button>
+          <button class="btn-icon" id="btn-game-exit" aria-label="Exit Game">✕</button>
+        </div>
+        <div class="hud-center">
+          <div class="hud-level-title" id="hud-level-name">Sector 1: Intake Calibration</div>
+          <div class="hud-stats-pill">
+            <span id="hud-sorted-label">SORTED: 0 / 8</span>
+            <span class="hud-divider">|</span>
+            <span id="hud-mistakes-label">MISTAKES: 0/3</span>
+          </div>
+        </div>
+        <div class="hud-right">
+          <button class="btn-icon btn-mute" aria-label="Toggle Sound">🔊</button>
+          <button class="btn-icon" id="btn-game-retry" aria-label="Retry Level">↺</button>
+        </div>
+      </header>
+
+      <!-- Main Arena Area -->
+      <div class="sorting-arena-body" id="sorting-arena-body">
+        <!-- Dual Target Containers -->
+        <div class="containers-row">
+          <!-- 1. Alphabets Container Chamber -->
+          <div class="chamber-box chamber-alpha" id="container-alpha" data-container-id="alphabet">
+            <div class="chamber-glow"></div>
+            <div class="chamber-header">
+              <span class="chamber-badge">🔤 LETTERS</span>
+              <span class="chamber-tally" id="alpha-tally">0</span>
+            </div>
+            <div class="chamber-drop-aperture">
+              <img src="../conveyor-sorter-assets/page-4/container-alpha.png" alt="Alphabets Container" class="chamber-img">
+              <div class="drop-target-guide">DROP ALPHABETS HERE</div>
+            </div>
+          </div>
+
+          <!-- 2. Numbers Container Chamber -->
+          <div class="chamber-box chamber-number" id="container-number" data-container-id="number">
+            <div class="chamber-glow"></div>
+            <div class="chamber-header">
+              <span class="chamber-badge">🔢 NUMBERS</span>
+              <span class="chamber-tally" id="number-tally">0</span>
+            </div>
+            <div class="chamber-drop-aperture">
+              <img src="../conveyor-sorter-assets/page-4/container-number.png" alt="Numbers Container" class="chamber-img">
+              <div class="drop-target-guide">DROP NUMBERS HERE</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Scanner Telemetry Strip -->
+        <div class="scanner-telemetry-strip" id="scanner-telemetry-strip">
+          <span class="scanner-status" id="scanner-status">OPTICAL SENSORS ACTIVE</span>
+          <span class="streak-pill" id="streak-pill">STREAK: 0🔥</span>
+        </div>
+
+        <!-- Conveyor Track & Interactive Token Lane -->
+        <div class="conveyor-track-stage" id="conveyor-track-stage">
+          <div class="conveyor-hazard-strip top-hazard"></div>
+          <div class="conveyor-belt-surface" id="conveyor-belt-surface">
+            <!-- Animated roller lines rendered by CSS / canvas -->
+          </div>
+          <div class="conveyor-hazard-strip bottom-hazard"></div>
+
+          <!-- Token Spawn Layer (Tokens are placed and dragged inside here) -->
+          <div class="tokens-lane" id="tokens-lane"></div>
+        </div>
+      </div>
+
+      <!-- Bottom Interactive Tactical Controls Deck (Permanent on Screen) -->
+      <footer class="game-controls-bar conveyor-deck" id="game-controls-bar">
+        <!-- Row 1: Direct Quick-Sort Action Keys -->
+        <div class="deck-row deck-row-sort">
+          <button class="deck-btn btn-action btn-sort-alpha" id="btn-sort-alpha" aria-label="Drop into Alphabets">
+            <kbd class="deck-kbd">A / ◄</kbd>
+            <span class="btn-text">🔤 DROP IN ALPHABETS</span>
+          </button>
+          <button class="deck-btn btn-action btn-sort-num" id="btn-sort-num" aria-label="Drop into Numbers">
+            <kbd class="deck-kbd">N / ►</kbd>
+            <span class="btn-text">🔢 DROP IN NUMBERS</span>
+          </button>
+        </div>
+
+        <!-- Row 2: Conveyor Belt Speed & Pause Controls -->
+        <div class="deck-row deck-row-belt">
+          <button class="deck-btn btn-steer btn-belt-pause" id="btn-belt-pause" aria-label="Pause or Resume Conveyor">
+            <kbd class="deck-kbd">SPACE</kbd>
+            <span class="btn-text" id="label-belt-pause">⏸️ PAUSE BELT</span>
+          </button>
+          <button class="deck-btn btn-steer btn-belt-speed" id="btn-belt-speed" aria-label="Toggle Fast Forward">
+            <kbd class="deck-kbd">⚡</kbd>
+            <span class="btn-text" id="label-belt-speed">SPEED: 1X</span>
+          </button>
+        </div>
+
+        <!-- Row 3: Auxiliary System Keys -->
+        <div class="deck-row deck-row-aux">
+          <button class="deck-aux-btn" id="btn-deck-retry" aria-label="Retry Level">
+            <kbd>R</kbd> Retry
+          </button>
+          <button class="deck-aux-btn" id="btn-deck-rules" aria-label="Rules & Guide">
+            <kbd>I</kbd> Rules
+          </button>
+          <button class="deck-aux-btn" id="btn-deck-map" aria-label="Sector Map">
+            <kbd>MAP</kbd> Levels
+          </button>
+          <button class="deck-aux-btn" id="btn-deck-exit" aria-label="Exit Game">
+            <kbd>ESC</kbd> Exit
+          </button>
+        </div>
+      </footer>
+
+      <!-- Mission Rules Sheet Modal -->
+      <div class="rules-modal" id="modal-rules" role="dialog" aria-modal="true" aria-label="Mission Rules">
+        <div class="rules-sheet-content">
+          <div class="rules-sheet-header">
+            <h3 class="rules-sheet-title">Conveyor Sorter Rules</h3>
+            <button class="btn-icon" id="btn-close-rules" aria-label="Close Rules">✕</button>
+          </div>
+          <div class="rules-sheet-body">
+            <div class="rule-item">
+              <span class="rule-icon">🖐️</span>
+              <div class="rule-text">
+                <strong>Drag &amp; Drop Control</strong>
+                <p>• Touch and drag any moving token.<br>
+                • Drop it over the <strong>🔤 Alphabets Container</strong> or <strong>🔢 Numbers Container</strong>.<br>
+                • Container glows on valid hover.</p>
+              </div>
+            </div>
+            <div class="rule-item">
+              <span class="rule-icon">🕹️</span>
+              <div class="rule-text">
+                <strong>Instant On-Screen Buttons</strong>
+                <p>• <strong>🔤 DROP IN ALPHABETS:</strong> Tap to automatically sort the leading token into the Letters container.<br>
+                • <strong>🔢 DROP IN NUMBERS:</strong> Tap to sort the leading token into the Numbers container.<br>
+                • <strong>⏸️ PAUSE BELT:</strong> Pause or slow down incoming tokens.</p>
+              </div>
+            </div>
+            <div class="rule-item">
+              <span class="rule-icon">⭐</span>
+              <div class="rule-text">
+                <strong>Star Ratings &amp; Accuracy</strong>
+                <p>• <strong>3 Stars:</strong> Complete quota with 95%+ accuracy and zero mistakes.<br>
+                • <strong>2 Stars:</strong> Complete quota with 80%+ accuracy.<br>
+                • <strong>1 Star:</strong> Complete quota.</p>
+              </div>
+            </div>
+          </div>
+          <div class="rules-sheet-footer">
+            <button class="btn-primary" id="btn-rules-understand">RESUME CONVEYOR</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Victory Modal Overlay -->
+      <div class="game-modal" id="modal-victory" role="dialog" aria-modal="true" aria-label="Sector Complete">
+        <div class="modal-emblem-wrap">
+          <span class="modal-emblem-icon">🏆</span>
+        </div>
+        <h2 class="modal-title victory">Batch Verified!</h2>
+        <p class="modal-desc" id="victory-desc">Conveyor batch certified nominal. All tokens properly categorized.</p>
+        <div class="modal-stars-row" id="victory-stars-row">
+          <span class="modal-star-symbol">⭐</span>
+          <span class="modal-star-symbol">⭐</span>
+          <span class="modal-star-symbol">⭐</span>
+        </div>
+        <div class="modal-stats">
+          <div class="stat-box">
+            <span class="stat-label">Sorted</span>
+            <span class="stat-value" id="victory-sorted">8/8</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-label">Best Streak</span>
+            <span class="stat-value" id="victory-streak">8🔥</span>
+          </div>
+        </div>
+        <div class="modal-buttons">
+          <button class="btn-primary" id="btn-next-level">Next Sector ▶</button>
+          <button class="btn-secondary" id="btn-replay-level">Replay</button>
+          <button class="btn-secondary" id="btn-victory-map">Sector Map</button>
+        </div>
+      </div>
+
+      <!-- Defeat / Quota Overflow Modal Overlay -->
+      <div class="game-modal" id="modal-defeat" role="dialog" aria-modal="true" aria-label="Sorting Failure">
+        <div class="modal-emblem-wrap">
+          <span class="modal-emblem-icon">⚠️</span>
+        </div>
+        <h2 class="modal-title defeat">Batch Contaminated!</h2>
+        <p class="modal-desc" id="defeat-reason">Exceeded allowable sorting mistakes.</p>
+        <div class="modal-stats">
+          <div class="stat-box">
+            <span class="stat-label">Sorted</span>
+            <span class="stat-value" id="defeat-sorted">4</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-label">Mistakes</span>
+            <span class="stat-value" id="defeat-mistakes">3/3</span>
+          </div>
+        </div>
+        <div class="modal-buttons">
+          <button class="btn-primary" id="btn-defeat-retry">Recalibrate &amp; Retry</button>
+          <button class="btn-secondary" id="btn-defeat-map">Sector Map</button>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- Global Drag Layer for smooth, unclipped token drag & drop across the stage -->
+    <div class="drag-layer" id="drag-layer" aria-hidden="true"></div>
+
+  </main>
+
+  <script src="conveyor-sorter-core.js?v=1"></script>
+  <script src="conveyor-sorter-audio.js?v=1"></script>
+  <script src="conveyor-sorter.js?v=1"></script>
+</body>
+</html>
